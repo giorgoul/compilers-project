@@ -1,0 +1,13 @@
+1. exp -> term exp2
+2. exp2 -> + term exp2
+3. exp2 -> - term exp2
+4. exp2 -> ε
+5. term -> factor term2
+6. term2 -> ** factor term2
+7. term2 -> ε
+8. factor -> num
+9. factor -> (exp)
+10. num -> digit num_rest
+11. num_rest -> digit num_rest
+12. num_rest -> ε
+13. digit -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
