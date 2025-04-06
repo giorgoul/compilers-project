@@ -82,6 +82,7 @@ Identifier     = [_a-zA-Z][_a-zA-Z0-9]*
  "if"           { return symbol(sym.IF); }
  "else"         { return symbol(sym.ELSE); }
  "="            { return symbol(sym.EQUAL); }
+ ","            { return symbol(sym.COMMA); }
  "prefix"       { return symbol(sym.PREFIX); }
  "suffix"       { return symbol(sym.SUFFIX); }
  {Identifier}   { return symbol(sym.IDENTIFIER); }
