@@ -75,7 +75,6 @@ Identifier     = [_a-zA-Z][_a-zA-Z0-9]*
  "+"            { return symbol(sym.PLUS); }
  "("            { return symbol(sym.LPAREN); }
  ")"            { return symbol(sym.RPAREN); }
- ";"            { return symbol(sym.SEMI); }
  \"             { stringBuffer.setLength(0); yybegin(STRING); }
  "{"            { return symbol(sym.LBRACK); }
  "}"            { return symbol(sym.RBRACK); }
