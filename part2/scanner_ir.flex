@@ -84,6 +84,7 @@ Identifier     = [_a-zA-Z][_a-zA-Z0-9]*
  ","            { return symbol(sym.COMMA); }
  "prefix"       { return symbol(sym.PREFIX); }
  "suffix"       { return symbol(sym.SUFFIX); }
+ {LineTerminator} { return symbol(sym.NEWLINE); }
  {Identifier}   { return symbol(sym.IDENTIFIER); }
  {WhiteSpace}   { /* just skip what was found, do nothing */ }
 }

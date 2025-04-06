@@ -14,6 +14,7 @@ public class sym {
     public static final int COMMA = 9;
     public static final int PREFIX = 10;
     public static final int SUFFIX = 11;
-    public static final int STRING_LITERAL = 12;
-    public static final int IDENTIFIER = 13;
+    public static final int NEWLINE = 12;
+    public static final int STRING_LITERAL = 13;
+    public static final int IDENTIFIER = 14;
 }
