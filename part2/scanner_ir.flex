@@ -78,7 +78,7 @@ Identifier     = [_a-zA-Z][_a-zA-Z0-9]*
  ","            { return symbol(sym.COMMA); }
  "prefix"       { return symbol(sym.PREFIX); }
  "suffix"       { return symbol(sym.SUFFIX); }
- {LineTerminator} { return symbol(sym.NEWLINE); }
+ "reverse"      { return symbol(sym.REVERSE); }
  /* https://stackoverflow.com/questions/6033303/parse-tree-generation-with-java-cup */
  {Identifier}   { return symbol(sym.IDENTIFIER, yytext()); }
  {WhiteSpace}   { /* just skip what was found, do nothing */ }

@@ -30,7 +30,7 @@ scan with {: return s.next_token(); :};
  */
 
 /* Terminals (tokens returned by the scanner). */
-terminal            PLUS, LPAREN, RPAREN, LBRACK, RBRACK, IF, ELSE, EQUAL, PREFIX, SUFFIX, IDENTIFIER, NEWLINE, COMMA;
+terminal            PLUS, LPAREN, RPAREN, LBRACK, RBRACK, IF, ELSE, EQUAL, PREFIX, SUFFIX, IDENTIFIER, COMMA, REVERSE;
 terminal String     STRING_LITERAL;
 
 /*  Non terminals 
@@ -45,7 +45,7 @@ start with program;
  */
 
 program ::= func 
-            | program NEWLINE func
+            | program func
             ;
 func ::= IDENTIFIER:id LPAREN args:a RPAREN LBRACK STRING_LITERAL:b RBRACK            {: ir.write(id + "(" + a + ")" + "{" + b + "}\n"); ir.flush(); System.out.println(id + "(" + a + ")" + "{" + b + "}\n"); :}; 
 args ::= IDENTIFIER:id COMMA args2:a2                                                    {: RESULT = id + "," + a2; :}
