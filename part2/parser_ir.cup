@@ -2,14 +2,24 @@
  *  Package and Import Specifications
  */
 import java_cup.runtime.*;
+import java.io.*;
 
 /**
  *  Usercode Components
  */
 parser code {:
     // Connect this parser to a scanner!
+    // Also create the Translated.ir file to be accessed by each action.
     ScannerIR s;
-    ParserIR(ScannerIR s){ this.s=s; }
+    BufferedWriter ir;
+    ParserIR(ScannerIR s) { 
+        this.s=s;
+        try {
+            ir = new BufferedWriter(new FileWriter("Translated.ir"));
+        } catch (IOException e) {
+            System.out.println("Error creating Translated.ir");
+        }
+    }
 :}
 
 /* define how to connect to the scanner! */
@@ -37,11 +47,11 @@ start with program;
 program ::= func 
             | program NEWLINE func
             ;
-func ::= IDENTIFIER LPAREN args RPAREN LBRACK STRING_LITERAL:b RBRACK            {: System.out.println(b);       :}; 
-args ::= IDENTIFIER COMMA args2
-        | IDENTIFIER
-        |
+func ::= IDENTIFIER:id LPAREN args:a RPAREN LBRACK STRING_LITERAL:b RBRACK            {: ir.write(id + "(" + a + ")" + "{" + b + "}\n"); ir.flush(); System.out.println(id + "(" + a + ")" + "{" + b + "}\n"); :}; 
+args ::= IDENTIFIER:id COMMA args2:a2                                                    {: RESULT = id + "," + a2; :}
+        | IDENTIFIER:id2                                                                 {: RESULT = id2; :}
+        |                                                                                {: RESULT = ""; :}
         ;
-args2 ::= IDENTIFIER COMMA args2
-        | IDENTIFIER
+args2 ::= IDENTIFIER:id COMMA args2:a2                                                        {: RESULT = id + "," + a2; :}
+        | IDENTIFIER:id2                                                                    {: RESULT = id2; :}
         ;
