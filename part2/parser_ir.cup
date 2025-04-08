@@ -47,7 +47,7 @@ start with program;
 program ::= func 
             | program func
             ;
-func ::= IDENTIFIER:id LPAREN args:a RPAREN LBRACK STRING_LITERAL:b RBRACK            {: ir.write(id + "(" + a + ")" + "{" + b + "}\n"); ir.flush(); System.out.println(id + "(" + a + ")" + "{" + b + "}\n"); :}; 
+func ::= IDENTIFIER:id LPAREN args:a RPAREN LBRACK STRING_LITERAL:b RBRACK            {: ir.write(id + "(" + a + ")" + "{" + "\"" + b + "\"" + "}"); ir.flush(); System.out.print(id + "(" + a + ")" + "{" + "\"" + b + "\"" + "}"); :}; 
 args ::= IDENTIFIER:id COMMA args2:a2                                                    {: RESULT = id + "," + a2; :}
         | IDENTIFIER:id2                                                                 {: RESULT = id2; :}
         |                                                                                {: RESULT = ""; :}
