@@ -1,0 +1,38 @@
+/**
+ *  Package and Import Specifications
+ */
+import java_cup.runtime.*;
+
+/**
+ *  Usercode Components
+ */
+parser code {:
+    // Connect this parser to a scanner!
+    ScannerIR s;
+    ParserIR(ScannerIR s){ this.s=s; }
+:}
+
+/* define how to connect to the scanner! */
+scan with {: return s.next_token(); :};
+
+/**
+ *  Symbol Lists
+ */
+
+/* Terminals (tokens returned by the scanner). */
+terminal            PLUS, LPAREN, RPAREN, LBRACK, RBRACK, IF, ELSE, EQUAL, PREFIX, SUFFIX, IDENTIFIER, NEWLINE, COMMA;
+terminal String     STRING_LITERAL;
+
+/*  Non terminals 
+    Simplified version for now, recognizes functions with no arguments
+    with a string literal as the body, e.g. name(){"John"} */
+non terminal            program, func;
+
+start with program;
+
+/**
+ *  The Grammar Rules
+ */
+
+program ::= func | program func                                                                                   ;
+func ::= IDENTIFIER LPAREN RPAREN LBRACK STRING_LITERAL:b RBRACK            {: System.out.println(b);           :}; 

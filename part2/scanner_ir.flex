@@ -23,12 +23,6 @@ import java_cup.runtime.*;
 %cup
 
 /*
-    Make a standalone scanner, i.e. without requiring a parser for
-    testing purposes.
-*/
-%standalone
-
-/*
   Declarations
 
   Code between %{ and %}, both of which must be at the beginning of a
