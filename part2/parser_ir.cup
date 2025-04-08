@@ -24,9 +24,9 @@ terminal            PLUS, LPAREN, RPAREN, LBRACK, RBRACK, IF, ELSE, EQUAL, PREFI
 terminal String     STRING_LITERAL;
 
 /*  Non terminals 
-    Simplified version for now, recognizes functions with no arguments
-    with a string literal as the body, e.g. name(){"John"} */
-non terminal            program, func;
+    Simplified version for now, accepts functions with zero or more identifier arguments
+    with a string literal as the body, e.g. name(x,y){"John"} */
+non terminal            program, func, args, args2;
 
 start with program;
 
@@ -34,5 +34,14 @@ start with program;
  *  The Grammar Rules
  */
 
-program ::= func | program func                                                                                   ;
-func ::= IDENTIFIER LPAREN RPAREN LBRACK STRING_LITERAL:b RBRACK            {: System.out.println(b);           :}; 
+program ::= func 
+            | program NEWLINE func
+            ;
+func ::= IDENTIFIER LPAREN args RPAREN LBRACK STRING_LITERAL:b RBRACK            {: System.out.println(b);       :}; 
+args ::= IDENTIFIER COMMA args2
+        | IDENTIFIER
+        |
+        ;
+args2 ::= IDENTIFIER COMMA args2
+        | IDENTIFIER
+        ;
