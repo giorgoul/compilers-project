@@ -36,7 +36,7 @@ terminal String     STRING_LITERAL;
 /*  Non terminals 
     Simplified version for now, accepts functions with zero or more identifier arguments
     with a string literal as the body, e.g. name(x,y){"John"} */
-non terminal            program, func, args, args2;
+non terminal            program, func, args, args2, func_body, concat;
 
 start with program;
 
@@ -47,7 +47,13 @@ start with program;
 program ::= func 
             | program func
             ;
-func ::= IDENTIFIER:id LPAREN args:a RPAREN LBRACK STRING_LITERAL:b RBRACK            {: ir.write(id + "(" + a + ")" + "{" + "\"" + b + "\"" + "}"); ir.flush(); System.out.print(id + "(" + a + ")" + "{" + "\"" + b + "\"" + "}"); :}; 
+func ::= IDENTIFIER:id LPAREN args:a RPAREN LBRACK func_body:b RBRACK            {: ir.write(id + "(" + a + ")" + "{" + b + "}"); ir.flush(); System.out.print(id + "(" + a + ")" + "{" + b + "}"); :};
+func_body ::= concat:c                                                         {: RESULT = c; :};
+concat ::= STRING_LITERAL:str PLUS concat:c                                             {: RESULT = str + "+" + c; :}
+        | STRING_LITERAL:str                                                            {: RESULT = "\"" + str + "\""; :}
+        | IDENTIFIER:id PLUS concat:c                                                   {: RESULT = id + "+" + c; :}
+        | IDENTIFIER:id                                                                 {: RESULT = id; :}
+        ;
 args ::= IDENTIFIER:id COMMA args2:a2                                                    {: RESULT = id + "," + a2; :}
         | IDENTIFIER:id2                                                                 {: RESULT = id2; :}
         |                                                                                {: RESULT = ""; :}
