@@ -34,7 +34,7 @@ terminal            PLUS, LPAREN, RPAREN, FUNCOPEN, RBRACK, IF, ELSE, EQUAL, PRE
 terminal String     STRING_LITERAL;
 
 /* Non terminals */
-non terminal            program, func, args, args2, func_body, concat, empty_func_call;
+non terminal            program, func, args, args2, func_body, concat, func_call, params;
 
 start with program;
 
@@ -44,7 +44,7 @@ start with program;
 
 program ::= func 
             | program func
-            | program empty_func_call
+            | program func_call
             ;
 func ::= IDENTIFIER:id LPAREN args:a FUNCOPEN func_body:b RBRACK            {: ir.write(id + "(" + a + ")" + "{" + b + "}"); ir.flush(); System.out.print(id + "(" + a + ")" + "{" + b + "}"); :};
 func_body ::= concat:c                                                         {: RESULT = c; :};
@@ -60,5 +60,10 @@ args ::= IDENTIFIER:id COMMA args2:a2                                           
 args2 ::= IDENTIFIER:id COMMA args2:a2                                                        {: RESULT = id + "," + a2; :}
         | IDENTIFIER:id2                                                                    {: RESULT = id2; :}
         ;
-/* Just for testing, will update with parameters later */
-empty_func_call ::= IDENTIFIER:id LPAREN RPAREN                                 {: ir.write(id + "()"); ir.flush(); System.out.print(id + "()"); :};
+func_call ::= IDENTIFIER:id LPAREN params:p RPAREN                                 {: ir.write(id + "(" + p + ")"); ir.flush(); System.out.print(id + "(" + p + ")"); RESULT = id + "(" + p + ")"; :};
+params ::= STRING_LITERAL:str COMMA params:p                                              {: RESULT = "\"" + str + "\"" + "," + p; :}
+        | func_call:fc COMMA params:p                                                     {: RESULT = fc + "," + p; :}
+        | STRING_LITERAL:str                                                                {: RESULT = "\"" + str + "\""; :}                                                    
+        | func_call:fc                                                                      {: RESULT = fc; :}
+        |                                                                                   {: RESULT = ""; :}
+        ;
