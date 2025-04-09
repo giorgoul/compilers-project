@@ -59,6 +59,9 @@ WhiteSpace     = {LineTerminator} | [ \t\f]
 /* https://stackoverflow.com/questions/35578567/java-regex-for-identifiers-letters-digits-and-underscores */
 Identifier     = [_a-zA-Z][_a-zA-Z0-9]*
 
+/* piazza @52_f2 */
+FuncOpen       = {WhiteSpace}*\){WhiteSpace}*\{{WhiteSpace}*
+
 %state STRING
 
 %%
@@ -68,9 +71,9 @@ Identifier     = [_a-zA-Z][_a-zA-Z0-9]*
 /* operators */
  "+"            { return symbol(sym.PLUS); }
  "("            { return symbol(sym.LPAREN); }
+ {FuncOpen}     { return symbol(sym.FUNCOPEN); }
  ")"            { return symbol(sym.RPAREN); }
  \"             { stringBuffer.setLength(0); yybegin(STRING); }
- "{"            { return symbol(sym.LBRACK); }
  "}"            { return symbol(sym.RBRACK); }
  "if"           { return symbol(sym.IF); }
  "else"         { return symbol(sym.ELSE); }

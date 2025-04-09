@@ -30,13 +30,11 @@ scan with {: return s.next_token(); :};
  */
 
 /* Terminals (tokens returned by the scanner). */
-terminal            PLUS, LPAREN, RPAREN, LBRACK, RBRACK, IF, ELSE, EQUAL, PREFIX, SUFFIX, IDENTIFIER, COMMA, REVERSE;
+terminal            PLUS, LPAREN, RPAREN, FUNCOPEN, RBRACK, IF, ELSE, EQUAL, PREFIX, SUFFIX, IDENTIFIER, COMMA, REVERSE;
 terminal String     STRING_LITERAL;
 
-/*  Non terminals 
-    Simplified version for now, accepts functions with zero or more identifier arguments
-    with a string literal as the body, e.g. name(x,y){"John"} */
-non terminal            program, func, args, args2, func_body, concat;
+/* Non terminals */
+non terminal            program, func, args, args2, func_body, concat, empty_func_call;
 
 start with program;
 
@@ -46,8 +44,9 @@ start with program;
 
 program ::= func 
             | program func
+            | program empty_func_call
             ;
-func ::= IDENTIFIER:id LPAREN args:a RPAREN LBRACK func_body:b RBRACK            {: ir.write(id + "(" + a + ")" + "{" + b + "}"); ir.flush(); System.out.print(id + "(" + a + ")" + "{" + b + "}"); :};
+func ::= IDENTIFIER:id LPAREN args:a FUNCOPEN func_body:b RBRACK            {: ir.write(id + "(" + a + ")" + "{" + b + "}"); ir.flush(); System.out.print(id + "(" + a + ")" + "{" + b + "}"); :};
 func_body ::= concat:c                                                         {: RESULT = c; :};
 concat ::= STRING_LITERAL:str PLUS concat:c                                             {: RESULT = str + "+" + c; :}
         | STRING_LITERAL:str                                                            {: RESULT = "\"" + str + "\""; :}
@@ -61,3 +60,5 @@ args ::= IDENTIFIER:id COMMA args2:a2                                           
 args2 ::= IDENTIFIER:id COMMA args2:a2                                                        {: RESULT = id + "," + a2; :}
         | IDENTIFIER:id2                                                                    {: RESULT = id2; :}
         ;
+/* Just for testing, will update with parameters later */
+empty_func_call ::= IDENTIFIER:id LPAREN RPAREN                                 {: ir.write(id + "()"); ir.flush(); System.out.print(id + "()"); :};
