@@ -34,7 +34,7 @@ terminal            PLUS, LPAREN, RPAREN, FUNCOPEN, RBRACK, IF, ELSE, EQUAL, PRE
 terminal String     STRING_LITERAL, IDENTIFIER;
 
 /* Non terminals */
-non terminal String            program_start, program, func, args, args2, func_body, func_call, func_call_func, params, params_func, expr_func, if_else_stmt_func, if_else_body_func;
+non terminal String            program_start, program, func, args, args2, func_body, func_call, func_call_func, params, params_func, expr_func, if_else_stmt_func, if_else_body_func, func_decls, func_calls;
 
 start with program_start;
 
@@ -42,10 +42,13 @@ start with program_start;
  *  The Grammar Rules
  */
 
-program_start ::= program:p                                                         {: ir.write(p); ir.flush(); ir.close(); System.out.print(p); :};
-program ::= func:f                                                                  {: RESULT = f; :}
-            | program:p func:f                                                      {: RESULT = p + f; :}                                      
-            | program:p func_call:fc                                                {: RESULT = p + fc; :}
+program_start ::= program:p                                                         {: ir.write(p); ir.flush(); ir.close(); :};
+program ::= func_decls:fds func_calls:fcs                                           {: RESULT = fds + fcs; :};
+func_decls ::= func_decls:fds func:f                                                {: RESULT = fds + f; :}
+            | func:f                                                                {: RESULT = f; :}
+            ;
+func_calls ::= func_calls:fcs func_call:fc                                          {: RESULT = fcs + fc; :}
+            | func_call:fc                                                          {: RESULT = fc; :}
             ;
 func ::= IDENTIFIER:id LPAREN args:a FUNCOPEN func_body:b RBRACK                    {: RESULT = id + "(" + a + ")" + "{" + b + "}"; :};
 func_body ::= expr_func:e                                                           {: RESULT = e; :}
