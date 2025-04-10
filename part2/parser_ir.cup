@@ -49,7 +49,7 @@ program ::= func:f                                                              
             ;
 func ::= IDENTIFIER:id LPAREN args:a FUNCOPEN func_body:b RBRACK                    {: RESULT = id + "(" + a + ")" + "{" + b + "}"; :};
 func_body ::= expr_func:e                                                           {: RESULT = e; :}
-            | if_else_stmt:if_else                                                  {: RESULT = if_else; :}
+            | if_else_stmt_func:if_else                                             {: RESULT = if_else; :}
             ;
 args ::= IDENTIFIER:id COMMA args2:a2                                               {: RESULT = id + "," + a2; :}
         | IDENTIFIER:id2                                                            {: RESULT = id2; :}
@@ -82,5 +82,7 @@ expr_func ::= REVERSE expr_func:exp                                             
             | IDENTIFIER:id PLUS expr_func:exp                                      {: RESULT = id + "+" + exp; :}
             | func_call_func:fc PLUS expr_func:exp                                  {: RESULT = fc + "+" + exp; :}
             ;
-if_else_stmt_func ::= IF LPAREN expr_func:exp1 PREFIX expr_func:exp2 RPAREN if_else_body:if_body ELSE if_else_body:else_body             {: RESULT = "if(" + exp1 + "prefix" + exp2 + ")" + if_body + "else" + else_body; :};
-if_else_body_func ::= expr_func:exp                                                                                                      {: RESULT = exp; :};
+if_else_stmt_func ::= IF LPAREN expr_func:exp1 PREFIX expr_func:exp2 RPAREN if_else_body_func:if_body ELSE if_else_body_func:else_body                  {: RESULT = "if(" + exp1 + "prefix" + exp2 + ")" + if_body + "else" + else_body; :}
+                    | IF LPAREN expr_func:exp1 SUFFIX expr_func:exp2 RPAREN if_else_body_func:if_body ELSE if_else_body_func:else_body                  {: RESULT = "if(reverse" + exp1 + "prefix reverse" + exp2 + ")" + if_body + "else" + else_body; :}
+                    ;
+if_else_body_func ::= expr_func:exp                                                                                                                     {: RESULT = exp; :};
