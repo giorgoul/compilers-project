@@ -34,7 +34,7 @@ terminal            PLUS, LPAREN, RPAREN, FUNCOPEN, RBRACK, IF, ELSE, EQUAL, PRE
 terminal String     STRING_LITERAL, IDENTIFIER;
 
 /* Non terminals */
-non terminal String            program_start, program, func, args, args2, func_body, concat, func_call, params;
+non terminal String            program_start, program, func, args, args2, func_body, func_call, func_call_func, params, params_func, expr_func;
 
 start with program_start;
 
@@ -48,12 +48,7 @@ program ::= func:f                                                              
             | program:p func_call:fc                                             {: RESULT = p + fc; :}
             ;
 func ::= IDENTIFIER:id LPAREN args:a FUNCOPEN func_body:b RBRACK            {: RESULT = id + "(" + a + ")" + "{" + b + "}"; :};
-func_body ::= concat:c                                                         {: RESULT = c; :};
-concat ::= STRING_LITERAL:str PLUS concat:c                                             {: RESULT = str + "+" + c; :}
-        | STRING_LITERAL:str                                                            {: RESULT = "\"" + str + "\""; :}
-        | IDENTIFIER:id PLUS concat:c                                                   {: RESULT = id + "+" + c; :}
-        | IDENTIFIER:id                                                                 {: RESULT = id; :}
-        ;
+func_body ::= expr_func:e                                                         {: RESULT = e; :};
 args ::= IDENTIFIER:id COMMA args2:a2                                                    {: RESULT = id + "," + a2; :}
         | IDENTIFIER:id2                                                                 {: RESULT = id2; :}
         |                                                                                {: RESULT = ""; :}
@@ -62,9 +57,26 @@ args2 ::= IDENTIFIER:id COMMA args2:a2                                          
         | IDENTIFIER:id2                                                                    {: RESULT = id2; :}
         ;
 func_call ::= IDENTIFIER:id LPAREN params:p RPAREN                                 {: RESULT = id + "(" + p + ")"; :};
+func_call_func ::= IDENTIFIER:id LPAREN params_func:p RPAREN                                  {: RESULT = id + "(" + p + ")"; :};
 params ::= STRING_LITERAL:str COMMA params:p                                              {: RESULT = "\"" + str + "\"" + "," + p; :}
         | func_call:fc COMMA params:p                                                     {: RESULT = fc + "," + p; :}
         | STRING_LITERAL:str                                                                {: RESULT = "\"" + str + "\""; :}                                                    
         | func_call:fc                                                                      {: RESULT = fc; :}
         |                                                                                   {: RESULT = ""; :}
         ;
+params_func ::= STRING_LITERAL:str COMMA params_func:p                              {: RESULT = "\"" + str + "\"" + "," + p; :}
+            | func_call_func:fc COMMA params_func:p                                 {: RESULT = fc + "," + p; :}
+            | IDENTIFIER:id COMMA params_func:p                                     {: RESULT = id + "," + p; :}
+            | STRING_LITERAL:str                                                    {: RESULT = "\"" + str + "\""; :}
+            | func_call_func:fc                                                     {: RESULT = fc; :}
+            | IDENTIFIER:id                                                         {: RESULT = id; :}
+            |                                                                       {: RESULT = ""; :}
+            ;
+expr_func ::= REVERSE expr_func:exp                                                 {: RESULT = "reverse" + exp; :}
+            | STRING_LITERAL:str                                                    {: RESULT = "\"" + str + "\""; :}
+            | IDENTIFIER:id                                                         {: RESULT = id; :}
+            | func_call_func:fc                                                     {: RESULT = fc; :}
+            | STRING_LITERAL:str PLUS expr_func:exp                                 {: RESULT = "\"" + str + "\"" + "+" + exp; :}
+            | IDENTIFIER:id PLUS expr_func:exp                                      {: RESULT = id + "+" + exp; :}
+            | func_call_func:fc PLUS expr_func:exp                                  {: RESULT = fc + "+" + exp; :}
+            ;
