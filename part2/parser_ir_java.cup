@@ -1,0 +1,87 @@
+/**
+ *  Package and Import Specifications
+ */
+import java_cup.runtime.*;
+import java.io.*;
+
+/**
+ *  Usercode Components
+ */
+parser code {:
+    // Connect this parser to a scanner!
+    // Also create the Translated.ir file to be accessed by each action.
+    ScannerIR s;
+    BufferedWriter translated;
+    ParserIRJava(ScannerIR s) { 
+        this.s=s;
+        try {
+            translated = new BufferedWriter(new FileWriter("Translated.javac"));
+        } catch (IOException e) {
+            System.out.println("Error creating Translated.javac");
+        }
+    }
+:}
+
+/* define how to connect to the scanner! */
+scan with {: return s.next_token(); :};
+
+/**
+ *  Symbol Lists
+ */
+
+/* Terminals (tokens returned by the scanner). */
+terminal            PLUS, LPAREN, RPAREN, FUNCOPEN, RBRACK, IF, ELSE, EQUAL, PREFIX, SUFFIX, COMMA, REVERSE;
+terminal String     STRING_LITERAL, IDENTIFIER;
+
+/* Non terminals */
+non terminal String            program_start, program, func, args, args2, func_body, func_call, func_call_func, params, params_func, expr_func, if_else_stmt_func, if_else_body_func, func_calls, func_decls;
+
+start with program_start;
+
+/**
+ *  The Grammar Rules
+ */
+
+program_start ::= program:p                                                         {: translated.flush(); translated.close(); :};
+program ::= func_decls:fds func_calls:fcs                                           {: translated.write("public class Translated { public static void main(String[] args) {" + fcs + "}" + fds + "}"); RESULT = fds + fcs; :};
+func_decls ::= func_decls:fds func:f                                                {: RESULT = fds + f; :}
+            | func:f                                                                {: RESULT = f; :}
+            ;
+func_calls ::= func_calls:fcs func_call:fc                                          {: RESULT = fcs + "System.out.println(" + fc + ");"; :}
+            | func_call:fc                                                          {: RESULT = "System.out.println(" + fc + ");"; :}
+            ;
+func ::= IDENTIFIER:id LPAREN args:a FUNCOPEN func_body:b RBRACK                    {: RESULT = "public static String " + id + "(" + a + ")" + "{" + b + "}"; :};
+func_body ::= expr_func:e                                                           {: RESULT = "return " + e + ";"; :}
+            | if_else_stmt_func:if_else                                             {: RESULT = if_else; :}
+            ;
+args ::= IDENTIFIER:id COMMA args2:a2                                               {: RESULT = "String " + id + "," + a2; :}
+        | IDENTIFIER:id2                                                            {: RESULT = "String " + id2; :}
+        |                                                                           {: RESULT = ""; :}
+        ;
+args2 ::= IDENTIFIER:id COMMA args2:a2                                              {: RESULT = "String " + id + "," + a2; :}
+        | IDENTIFIER:id2                                                            {: RESULT = "String " + id2; :}
+        ;
+func_call ::= IDENTIFIER:id LPAREN params:p RPAREN                                  {: RESULT = id + "(" + p + ")"; :};
+func_call_func ::= IDENTIFIER:id LPAREN params_func:p RPAREN                        {: RESULT = id + "(" + p + ")"; :};
+params ::= STRING_LITERAL:str COMMA params:p                                        {: RESULT = "\"" + str + "\"" + "," + p; :}
+        | func_call:fc COMMA params:p                                               {: RESULT = fc + "," + p; :}
+        | STRING_LITERAL:str                                                        {: RESULT = "\"" + str + "\""; :}                                                    
+        | func_call:fc                                                              {: RESULT = fc; :}
+        |                                                                           {: RESULT = ""; :}
+        ;
+params_func ::= STRING_LITERAL:str COMMA params_func:p                              {: RESULT = "\"" + str + "\"" + "," + p; :}
+            | func_call_func:fc COMMA params_func:p                                 {: RESULT = fc + "," + p; :}
+            | IDENTIFIER:id COMMA params_func:p                                     {: RESULT = id + "," + p; :}
+            | STRING_LITERAL:str                                                    {: RESULT = "\"" + str + "\""; :}
+            | func_call_func:fc                                                     {: RESULT = fc; :}
+            | IDENTIFIER:id                                                         {: RESULT = id; :}
+            |                                                                       {: RESULT = ""; :}
+            ;
+expr_func ::= REVERSE expr_func:exp                                                 {: RESULT = "reverse" + exp; :}
+            | STRING_LITERAL:str                                                    {: RESULT = "\"" + str + "\""; :}
+            | IDENTIFIER:id                                                         {: RESULT = id; :}
+            | func_call_func:fc                                                     {: RESULT = fc; :}
+            | STRING_LITERAL:str PLUS expr_func:exp                                 {: RESULT = "\"" + str + "\"" + "+" + exp; :}
+            | IDENTIFIER:id PLUS expr_func:exp                                      {: RESULT = id + "+" + exp; :}
+            | func_call_func:fc PLUS expr_func:exp                                  {: RESULT = fc + "+" + exp; :}
+            ;
