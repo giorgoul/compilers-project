@@ -20,6 +20,14 @@ parser code {:
             System.out.println("Error creating Translated.javac");
         }
     }
+    @Override
+    public void syntax_error(Symbol cur_token) {
+        System.err.println(
+        "Syntax error at symbol '" + cur_token.value + 
+        "' (token code " + cur_token.sym + 
+        ") on line " + (cur_token.left + 1)
+        );
+    }
 :}
 
 /* define how to connect to the scanner! */
@@ -77,7 +85,7 @@ params_func ::= STRING_LITERAL:str COMMA params_func:p                          
             | IDENTIFIER:id                                                         {: RESULT = id; :}
             |                                                                       {: RESULT = ""; :}
             ;
-expr_func ::= REVERSE expr_func:exp                                                 {: RESULT = "reverse" + exp; :}
+expr_func ::= REVERSE expr_func:exp                                                 {: RESULT = "new StringBuilder(" + exp + ").reverse().toString()"; :}
             | STRING_LITERAL:str                                                    {: RESULT = "\"" + str + "\""; :}
             | IDENTIFIER:id                                                         {: RESULT = id; :}
             | func_call_func:fc                                                     {: RESULT = fc; :}
@@ -85,3 +93,7 @@ expr_func ::= REVERSE expr_func:exp                                             
             | IDENTIFIER:id PLUS expr_func:exp                                      {: RESULT = id + "+" + exp; :}
             | func_call_func:fc PLUS expr_func:exp                                  {: RESULT = fc + "+" + exp; :}
             ;
+if_else_stmt_func ::= IF LPAREN expr_func:exp1 PREFIX expr_func:exp2 RPAREN if_else_body_func:if_body ELSE if_else_body_func:else_body                  {: RESULT = "if(" + exp2 + ".startsWith(" + exp1 + ")" + ")" + "{" + if_body + "}" + "else" + "{" + else_body + "}"; :};
+if_else_body_func ::= expr_func:exp                                                                                                                     {: RESULT = "return " + exp + ";"; :}
+                    | if_else_stmt_func:if_else                                                                                                         {: RESULT = if_else; :}
+                    ;
