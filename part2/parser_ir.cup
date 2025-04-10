@@ -84,5 +84,8 @@ expr_func ::= REVERSE expr_func:exp                                             
             ;
 if_else_stmt_func ::= IF LPAREN expr_func:exp1 PREFIX expr_func:exp2 RPAREN if_else_body_func:if_body ELSE if_else_body_func:else_body                  {: RESULT = "if(" + exp1 + "prefix" + exp2 + ")" + if_body + "else" + else_body; :}
                     | IF LPAREN expr_func:exp1 SUFFIX expr_func:exp2 RPAREN if_else_body_func:if_body ELSE if_else_body_func:else_body                  {: RESULT = "if(reverse" + exp1 + "prefix reverse" + exp2 + ")" + if_body + "else" + else_body; :}
+                    | IF LPAREN expr_func:exp1 EQUAL expr_func:exp2 RPAREN if_else_body_func:if_body ELSE if_else_body_func:else_body                   {: RESULT = "if(" + exp1 + "prefix" + exp2 + ")" + "if(" + exp2 + "prefix" + exp1 + ")" + if_body + "else" + else_body + "else" + else_body; :}
                     ;
-if_else_body_func ::= expr_func:exp                                                                                                                     {: RESULT = exp; :};
+if_else_body_func ::= expr_func:exp                                                                                                                     {: RESULT = exp; :}
+                    | if_else_stmt_func:if_else                                                                                                         {: RESULT = if_else; :}
+                    ;
