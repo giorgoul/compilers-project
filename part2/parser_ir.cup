@@ -20,6 +20,15 @@ parser code {:
             System.out.println("Error creating Translated.ir");
         }
     }
+    @Override
+    public void syntax_error(Symbol cur_token) {
+        System.err.println(
+        "Syntax error at symbol '" + cur_token.value + 
+        "' (token code " + cur_token.sym + 
+        ") on line " + (cur_token.left + 1)
+        );
+        System.exit(1);
+    }
 :}
 
 /* define how to connect to the scanner! */
@@ -47,9 +56,9 @@ start with program_start;
 
 program_start ::= program:p                                                         {: ir.write(p); ir.flush(); ir.close(); :};
 /* Add eval(x) function for easier handling of top-level expressions */
-program ::= func_decls:fds program_tails:pts                                        {: RESULT = fds + "eval(x){x}" + pts; :};
-program_tails ::= program_tail:pt program_tails:pts                                 {: RESULT = "eval(" + pt + ")" + pts; :}
-                | program_tail:pt                                                   {: RESULT = "eval(" + pt + ")"; :}
+program ::= func_decls:fds program_tails:pts                                        {: RESULT = fds + pts; :};
+program_tails ::= program_tail:pt program_tails:pts                                 {: RESULT = pt + pts; :}
+                | program_tail:pt                                                   {: RESULT = pt; :}
                 ;
 program_tail ::= REVERSE program_tail:pt                                            {: RESULT = "reverse " + pt; :}
                 | STRING_LITERAL:str PLUS program_tail:pt                           {: RESULT = "\"" + str + "\"" + "+" + pt; :}
