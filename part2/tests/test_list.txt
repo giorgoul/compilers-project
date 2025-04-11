@@ -1,0 +1,28 @@
+example1.txt    John\nDoe\nJohn Doe\n
+example2.txt    John\nJaneJane\n
+example3.txt    Static\nDynamic\nProbably Dynamic\n
+example4.txt    all good\n
+example5.txt    ptes\n
+example6.txt    correct\n
+example7.txt    tcerroc\n
+example8.txt    Tralalero Tralala Bombardino Crocodilo\n
+example9.txt    Tralalero Tralala Bombardino Crocodilo\n
+example10.txt   good\n
+example11.txt   cba\n
+example12.txt   Suffix\n
+example13.txt   Hello, World!\n
+example14.txt   agorinatioumpa? agoris thodorina\n
+example15.txt   Success\n
+example16.txt   Chain OK\n
+example17.txt   cba123321\n
+example18.txt   Nested Works\n
+example19.txt   Correct\nCorrect\nCorrect\n
+example20.txt   BBBBBAntonisDourosABBBB\n
+precedence_test.txt yes correct\nyes incorrect input\nyes correct input\nsey tcerroc input
+error1.txt      Parse Error
+error2.txt      Parse Error
+error3.txt      Parse Error
+error4.txt      Parse Error
+error5.txt      Parse Error
+error6.txt      Parse Error
+error7.txt      Parse Error

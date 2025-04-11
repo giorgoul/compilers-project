@@ -1,0 +1,13 @@
+first() {
+  "Hello"
+}
+
+second() {
+  "World"
+}
+
+combine(a, b) {
+  a + ", " + b + "!"
+}
+
+combine(first(), second())

@@ -1,0 +1,4 @@
+if (reverse reverse "Snow" suffix "John Snow")
+    "good"
+else
+    "the fuck?"

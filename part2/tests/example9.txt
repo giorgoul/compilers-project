@@ -1,0 +1,52 @@
+name()  {
+   "John"
+}
+
+surname() {
+   "Doe"
+}
+
+fullname(first_name, sep, last_name) {
+   "Tralalero Tralala Bombardino Crocodilo"
+}
+
+correct() {
+   "Correct"
+}
+
+incorrect() {
+   "Incorrect"
+}
+
+how() {
+   "how did you get here?"
+}
+
+what() {
+  "lol"
+}
+
+eval(x) {
+   x
+}
+
+if (
+   eval(
+      if ("J" + "o" + "h" + "n" = name())  
+         if ("D" + "o" + "e" prefix surname())
+           if("D" + "o" + "e" suffix surname())
+            correct()
+           else
+             what()
+         else
+            if (reverse reverse "Do" + "e" suffix surname())
+               how()
+            else
+               "incorrect()"
+      else
+         incorrect()
+   ) prefix "Correct I guess"
+)
+ fullname("1", "2", "3")
+else
+   incorrect()

@@ -1,0 +1,24 @@
+outter_suff() {
+  if ("begin" + if("Test" suffix "suffixTest") " ending" else " wrong" suffix "begin ending")
+    "Correct"
+  else
+    "Incorrect"
+}
+
+outter_eq() {
+  if ("begin" + if("Test" suffix "suffixTest") " ending" else " wrong" = "begin ending")
+    "Correct"
+  else
+    "Incorrect"
+}
+
+outter_pref() {
+  if ("begin" + if("Test" prefix "prefixTest") " ending" else " wrong" prefix "begin ending")
+    "Incorrect"
+  else
+    "Correct"
+}
+
+outter_suff()
+outter_pref()
+outter_eq()

@@ -1,0 +1,8 @@
+outer() {
+  if ("s" suffix if("Ligdas" = "Teosty") "No" else if("def" suffix "yes" + "def") "Yes" else "Maybe")
+    "Nested Works"
+  else
+    "Nested Fails"
+}
+
+outer()

@@ -1,0 +1,9 @@
+my_function() {
+    "test"
+}
+
+my_function()
+
+another_function() {
+    
+}

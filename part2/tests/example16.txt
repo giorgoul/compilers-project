@@ -1,0 +1,26 @@
+funcA() {
+  "open"
+}
+
+funcB() {
+  "close"
+}
+
+flip(x) {
+  reverse x
+}
+
+chain() {
+  if (funcA() = flip("nepo"))
+    if (funcB() suffix "close")
+      if (flip(funcB()) = "esolc")
+        "Chain OK"
+      else
+        "Chain Fail 1"
+    else
+      "Chain Fail 2"
+  else
+    "Chain Fail 3"
+}
+
+chain()

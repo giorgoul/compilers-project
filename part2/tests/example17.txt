@@ -1,0 +1,9 @@
+twirl(x, y) {
+  reverse x + y + reverse y
+}
+
+jumble() {
+  twirl("abc", "123")
+}
+
+jumble()

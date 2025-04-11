@@ -1,0 +1,24 @@
+x() {
+  "thodoris"
+}
+
+y() {
+  "agorina"
+}
+
+z() {
+  "tioumpa?"
+}
+
+mix(a, b, c) {
+  if (a = "thodoris")
+    b + c
+  else
+    "agoris thodorina"
+}
+
+Teosty() {
+  mix(x(), y(), z()) + " " + mix("ligdas", y(), z())
+}
+
+Teosty()

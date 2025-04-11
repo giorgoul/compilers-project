@@ -1,0 +1,10 @@
+FinalBoss(first1, second2, third3, fourth4, fifth5, sixth6, seventh7, eighth8, ninth9, tenth10){
+  if(first1 suffix "Iteration: Ten")
+    "A" + if("123" suffix if("Teosty" = "Ligdas") "4014" else "321123") "soruoDsinotnA" else "Steve"
+
+  else
+    "B" + reverse FinalBoss(second2, third3, fourth4, fifth5, sixth6, seventh7, eighth8, ninth9, tenth10, first1)
+
+}
+
+FinalBoss("One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten")

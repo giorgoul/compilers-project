@@ -1,0 +1,15 @@
+name() {
+  "John"
+}
+
+repeat(x) {
+  x + x
+}
+
+cond_repeat(c, x) {
+  if ("?" suffix c)
+    repeat(x)
+}
+
+cond_repeat("yes", name())
+cond_repeat("no?", "Jane")

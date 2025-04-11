@@ -1,0 +1,18 @@
+my_reverse(my_string) {
+    reverse my_string
+}
+
+my_concat(parameter) {
+    if ( "these should not be equal" = "ptixio when?" )
+        reverse "error"
+    else
+        if ("these should be " + "equal" = "these should" + " be equal")
+            if (parameter = "")
+                my_reverse("correct")
+            else
+                my_concat("")
+        else
+            reverse "error"
+}
+
+reverse my_reverse(if (my_reverse("sikadgarams") = "smaragdakis") my_concat("tortelino diagrafino") else "error")

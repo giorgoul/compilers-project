@@ -1,0 +1,26 @@
+f1() {
+  "abc"
+}
+
+f2() {
+  "cba"
+}
+
+f3(x) {
+  x + reverse x
+}
+
+complex() {
+  if (f1() = reverse f2())
+    if (f3("one") prefix f3("one"))
+      if (f3("one") = "oneeno")
+        "Success"
+      else
+        "Failure1"
+    else
+      "Failure2"
+  else
+    "Failure3"
+}
+
+complex()

@@ -1,0 +1,8 @@
+checkSuffix() {
+  if ("le" suffix "apple")
+    "Suffix"
+  else
+    "Not Suffix"
+}
+
+checkSuffix()
