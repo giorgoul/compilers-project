@@ -44,6 +44,8 @@ terminal String     STRING_LITERAL, IDENTIFIER;
 /* Non terminals */
 non terminal String            program_start, program, func, args, args2, func_body, func_call, func_call_func, params, params_func, expr_func, if_else_stmt_func, if_else_body_func, func_calls, func_decls;
 
+precedence left COMMA;
+
 start with program_start;
 
 /**
@@ -83,10 +85,15 @@ params_func ::= STRING_LITERAL:str COMMA params_func:p                          
             | IDENTIFIER:id                                                         {: RESULT = id; :}
             |                                                                       {: RESULT = ""; :}
             ;
-expr_func ::= REVERSE expr_func:exp                                                 {: RESULT = "new StringBuilder(" + exp + ").reverse().toString()"; :}
+expr_func ::= REVERSE STRING_LITERAL:str                                            {: RESULT = "new StringBuilder(" + "\"" + str + "\"" + ").reverse().toString();"; :}
+            | REVERSE IDENTIFIER:id                                                 {: RESULT = "new StringBuilder(" + id + ").reverse().toString();"; :}
+            | REVERSE func_call_func:fc                                             {: RESULT = "new StringBuilder(" + fc + ").reverse().toString();"; :}
             | STRING_LITERAL:str                                                    {: RESULT = "\"" + str + "\""; :}
             | IDENTIFIER:id                                                         {: RESULT = id; :}
             | func_call_func:fc                                                     {: RESULT = fc; :}
+            | REVERSE STRING_LITERAL:str PLUS expr_func:exp                         {: RESULT = "new StringBuilder(" + "\"" + str + "\"" + ").reverse().toString()" + "+" + exp; :}
+            | REVERSE IDENTIFIER:id PLUS expr_func:exp                              {: RESULT = "new StringBuilder(" + id + ").reverse().toString()" + "+" + exp; :}
+            | REVERSE func_call_func:fc PLUS expr_func:exp                          {: RESULT = "new StringBuilder(" + fc + ").reverse().toString()" + "+" + exp; :}
             | STRING_LITERAL:str PLUS expr_func:exp                                 {: RESULT = "\"" + str + "\"" + "+" + exp; :}
             | IDENTIFIER:id PLUS expr_func:exp                                      {: RESULT = id + "+" + exp; :}
             | func_call_func:fc PLUS expr_func:exp                                  {: RESULT = fc + "+" + exp; :}

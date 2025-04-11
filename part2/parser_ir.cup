@@ -36,6 +36,9 @@ terminal String     STRING_LITERAL, IDENTIFIER;
 /* Non terminals */
 non terminal String            program_start, program, func, args, args2, func_body, func_call, func_call_func, params, params_func, expr_func, if_else_stmt_func, if_else_body_func, func_decls, program_tail, program_tails;
 
+precedence left IDENTIFIER;
+precedence left REVERSE;
+
 start with program_start;
 
 /**
@@ -56,6 +59,7 @@ program_tail ::= REVERSE program_tail:pt                                        
                 ;
 func_decls ::= func_decls:fds func:f                                                {: RESULT = fds + f; :}
             | func:f                                                                {: RESULT = f; :}
+            |                                                                       {: RESULT = ""; :}
             ;
 func ::= IDENTIFIER:id LPAREN args:a FUNCOPEN func_body:b RBRACK                    {: RESULT = id + "(" + a + ")" + "{" + b + "}"; :};
 func_body ::= expr_func:e                                                           {: RESULT = e; :}
