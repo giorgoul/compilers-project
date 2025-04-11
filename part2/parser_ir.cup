@@ -43,7 +43,7 @@ terminal            PLUS, LPAREN, RPAREN, FUNCOPEN, RBRACK, IF, ELSE, EQUAL, PRE
 terminal String     STRING_LITERAL, IDENTIFIER;
 
 /* Non terminals */
-non terminal String            program_start, program, func, args, args2, func_body, func_call, func_call_func, params, params_func, expr_func, if_else_stmt_func, if_else_body_func, func_decls, program_tail, program_tails;
+non terminal String            program_start, program, func, args, args2, func_body, func_call, func_call_func, params, params_func, expr_func, if_else_stmt_func, if_else_body_func, func_decls, expr, exprs;
 
 precedence left IDENTIFIER;
 precedence left REVERSE;
@@ -55,15 +55,14 @@ start with program_start;
  */
 
 program_start ::= program:p                                                         {: ir.write(p); ir.flush(); ir.close(); :};
-/* Add eval(x) function for easier handling of top-level expressions */
-program ::= func_decls:fds program_tails:pts                                        {: RESULT = fds + pts; :};
-program_tails ::= program_tail:pt program_tails:pts                                 {: RESULT = pt + pts; :}
-                | program_tail:pt                                                   {: RESULT = pt; :}
+program ::= func_decls:fds exprs:exps                                               {: RESULT = fds + exps; :};
+exprs ::= expr:exp exprs:exps                                                       {: RESULT = exp + exps; :}
+                | expr:exp                                                          {: RESULT = exp; :}
                 ;
-program_tail ::= REVERSE program_tail:pt                                            {: RESULT = "reverse " + pt; :}
-                | STRING_LITERAL:str PLUS program_tail:pt                           {: RESULT = "\"" + str + "\"" + "+" + pt; :}
+expr ::= REVERSE expr:exp                                                           {: RESULT = "reverse " + exp; :}
+                | STRING_LITERAL:str PLUS expr:exp                                  {: RESULT = "\"" + str + "\"" + "+" + exp; :}
                 | STRING_LITERAL:str                                                {: RESULT = "\"" + str + "\""; :}
-                | func_call:fc PLUS program_tail:pt                                 {: RESULT = fc + "+" + pt; :}
+                | func_call:fc PLUS expr:exp                                        {: RESULT = fc + "+" + exp; :}
                 | func_call:fc                                                      {: RESULT = fc; :}
                 ;
 func_decls ::= func_decls:fds func:f                                                {: RESULT = fds + f; :}
