@@ -15,7 +15,7 @@ parser code {:
     ParserIRJava(ScannerIR s) { 
         this.s=s;
         try {
-            translated = new BufferedWriter(new FileWriter("Translated.javac"));
+            translated = new BufferedWriter(new FileWriter("Translated.java"));
         } catch (IOException e) {
             System.out.println("Error creating Translated.javac");
         }
@@ -71,10 +71,8 @@ args2 ::= IDENTIFIER:id COMMA args2:a2                                          
         ;
 func_call ::= IDENTIFIER:id LPAREN params:p RPAREN                                  {: RESULT = id + "(" + p + ")"; :};
 func_call_func ::= IDENTIFIER:id LPAREN params_func:p RPAREN                        {: RESULT = id + "(" + p + ")"; :};
-params ::= STRING_LITERAL:str COMMA params:p                                        {: RESULT = "\"" + str + "\"" + "," + p; :}
-        | func_call:fc COMMA params:p                                               {: RESULT = fc + "," + p; :}
-        | STRING_LITERAL:str                                                        {: RESULT = "\"" + str + "\""; :}                                                    
-        | func_call:fc                                                              {: RESULT = fc; :}
+params ::= expr_func:exp COMMA params:p                                             {: RESULT = exp + "," + p; :}
+        | expr_func:exp                                                             {: RESULT = exp; :}
         |                                                                           {: RESULT = ""; :}
         ;
 params_func ::= STRING_LITERAL:str COMMA params_func:p                              {: RESULT = "\"" + str + "\"" + "," + p; :}
