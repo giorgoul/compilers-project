@@ -85,9 +85,9 @@ params_func ::= STRING_LITERAL:str COMMA params_func:p                          
             | IDENTIFIER:id                                                         {: RESULT = id; :}
             |                                                                       {: RESULT = ""; :}
             ;
-expr_func ::= REVERSE STRING_LITERAL:str                                            {: RESULT = "new StringBuilder(" + "\"" + str + "\"" + ").reverse().toString();"; :}
-            | REVERSE IDENTIFIER:id                                                 {: RESULT = "new StringBuilder(" + id + ").reverse().toString();"; :}
-            | REVERSE func_call_func:fc                                             {: RESULT = "new StringBuilder(" + fc + ").reverse().toString();"; :}
+expr_func ::= REVERSE STRING_LITERAL:str                                            {: RESULT = "new StringBuilder(" + "\"" + str + "\"" + ").reverse().toString()"; :}
+            | REVERSE IDENTIFIER:id                                                 {: RESULT = "new StringBuilder(" + id + ").reverse().toString()"; :}
+            | REVERSE func_call_func:fc                                             {: RESULT = "new StringBuilder(" + fc + ").reverse().toString()"; :}
             | STRING_LITERAL:str                                                    {: RESULT = "\"" + str + "\""; :}
             | IDENTIFIER:id                                                         {: RESULT = id; :}
             | func_call_func:fc                                                     {: RESULT = fc; :}
