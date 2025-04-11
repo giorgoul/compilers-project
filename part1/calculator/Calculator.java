@@ -54,8 +54,16 @@ class Calculator {
         return value;
     }
 
+    private void consume_whitespace() throws IOException, ParseError {
+        while (lookahead == ' ') {
+            consume(' ');
+        }
+    }
+
     private int exp() throws IOException, ParseError {
+        consume_whitespace();
         int first_term = term();
+        consume_whitespace();
         int result = exp2(first_term);
         return result;
     }
@@ -63,11 +71,13 @@ class Calculator {
     private int exp2(int sofar) throws IOException, ParseError {
         if (lookahead == '+') {
             consume('+');
+            consume_whitespace();
             int first_term = term();
             int result = exp2(sofar + first_term);
             return result;
         } else if (lookahead == '-') {
             consume('-');
+            consume_whitespace();
             int first_term = term();
             int result = exp2(sofar - first_term);
             return result;
@@ -80,6 +90,7 @@ class Calculator {
 
     private int term() throws IOException, ParseError {
         int num1 = factor();
+        consume_whitespace();
         int result = term2(num1);
         // Handles ε rules
         return result == Integer.MIN_VALUE ? num1 : result;
@@ -91,7 +102,9 @@ class Calculator {
             return num;
         } else if (lookahead == '(') {
             consume('(');
+            consume_whitespace();
             int result = exp();
+            consume_whitespace();
             consume(')');
             return result;
         }
@@ -103,7 +116,9 @@ class Calculator {
         if (lookahead == '*') {
             consume('*');
             consume('*');
+            consume_whitespace();
             int factor = factor();
+            consume_whitespace();
             int term2 = term2(factor);
             if (term2 == Integer.MIN_VALUE) {
                 // For ε rule
@@ -137,7 +152,7 @@ class Calculator {
             String s1 = s + String.valueOf(digit);
             s1 = s1 + num_rest(s1);
             return s1;
-        } else if (lookahead == ')' || lookahead == '+' || lookahead == '-' || lookahead == '*' || lookahead == '\n') {
+        } else if (lookahead == ')' || lookahead == '+' || lookahead == '-' || lookahead == '*' || lookahead == '\n' || lookahead == ' ') {
             // Again, we do nothing
             return s;
         }
