@@ -1,4 +1,4 @@
-# compilers-project-1
+# Compilers 2024-25 - Project 1
 
 Name: Γιώργος Ουλής  
 ΑΜ: 1115202100131
