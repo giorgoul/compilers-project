@@ -3,6 +3,24 @@ import visitor.*;
 
 
 class MyVisitor extends GJDepthFirst<String, Void>{
+    MySymbolTable symbolTable = new MySymbolTable();
+
+    // Current context for visitors, since I can't edit their
+    // function definitions. Useful for adding variables to the
+    // symbol table.
+
+    String currentClass = "";
+    int currentScope = -1;
+
+    protected void resetContext() {
+        this.currentClass = "";
+        this.currentScope = -1;
+    }
+
+    protected void setContext(String className, int scope) {
+        this.currentClass = className;
+        this.currentScope = scope;
+    }
     /**
      * f0 -> "class"
      * f1 -> Identifier()
@@ -26,11 +44,20 @@ class MyVisitor extends GJDepthFirst<String, Void>{
     @Override
     public String visit(MainClass n, Void argu) throws Exception {
         String classname = n.f1.accept(this, null);
-        System.out.println("Class: " + classname);
-
-        super.visit(n, argu);
-
-        System.out.println();
+        // This is a class, so scope is 0
+        symbolTable.insert(classname, "class", 0, "-");
+        
+        System.out.println("Main variables:");
+        // Add variables to symbolTable. In general, if a similar entry
+        // already exists in the symbolTable (i.e. same identifier, scope AND belongsTo)
+        // an exception occurs (TODO)
+        // Set context so that the VarDeclaration visitor adds the correct info to
+        // the symbol table
+        this.setContext(classname, 1);
+        n.f14.accept(this, argu);
+        this.resetContext();
+        
+        this.symbolTable.print();
 
         return null;
     }
@@ -103,7 +130,8 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         String type = n.f0.accept(this, argu);
         String var = n.f1.accept(this, argu);
         System.out.println(var + " " + type);
-        super.visit(n, argu);
+        this.symbolTable.insert(var, type, currentScope, this.currentClass);
+        // super.visit(n, argu);
         
         return _ret;
     }

@@ -19,6 +19,11 @@ public class MySymbolTable {
     }
 
     public void insert(String identifier, String type, int scope, String belongsTo) {
+        // Initialize non-existent linked list
+        if (this.map.get(identifier) == null) {
+            LinkedList<MySymbolTableEntry> list = new LinkedList<MySymbolTableEntry>();
+            this.map.put(identifier, list);
+        }
         this.map.get(identifier).add(new MySymbolTableEntry(identifier, type, scope, belongsTo));
     }
 
@@ -31,5 +36,18 @@ public class MySymbolTable {
             }
         }
         return new MySymbolTableEntry("not found", "-", -1, "-");
+    }
+
+    // For debugging purposes
+    public void print() {
+        System.out.println("identifier,type,scope,belongsTo");
+
+        // https://stackoverflow.com/questions/12310914/how-to-iterate-through-linkedhashmap-with-lists-as-values
+        for (String key : map.keySet()) {
+            LinkedList<MySymbolTableEntry> result = this.map.get(key);
+            for (MySymbolTableEntry entry : result) {
+                System.out.println(entry.id + "," + entry.type + "," + entry.scope + "," + entry.belongsTo);
+            }
+        }
     }
 }
