@@ -23,6 +23,7 @@ public class Main {
 
             MyVisitor eval = new MyVisitor();
             root.accept(eval, null);
+            eval.symbolTable.print();
         }
         catch(ParseException ex){
             System.out.println(ex.getMessage());

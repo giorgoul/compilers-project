@@ -1,5 +1,3 @@
-import java.util.LinkedHashMap;
-
 public class MySymbolTableEntry {
     String id;
     String type;

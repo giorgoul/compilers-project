@@ -45,7 +45,7 @@ class MyVisitor extends GJDepthFirst<String, Void>{
     public String visit(MainClass n, Void argu) throws Exception {
         String classname = n.f1.accept(this, null);
         // This is a class, so scope is 0
-        symbolTable.insert(classname, "class", 0, "-");
+        this.symbolTable.insert(classname, "mainclass", 0, "-");
         
         System.out.println("Main variables:");
         // Add variables to symbolTable. In general, if a similar entry
@@ -56,8 +56,6 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         this.setContext(classname, 1);
         n.f14.accept(this, argu);
         this.resetContext();
-        
-        this.symbolTable.print();
 
         return null;
     }
@@ -77,9 +75,13 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         String classname = n.f1.accept(this, argu);
         System.out.println("Class: " + classname);
 
+        this.symbolTable.insert(classname, "class", 0, "-");
+
         n.f2.accept(this, argu);
         System.out.println("Fields: ");
+        this.setContext(classname, 1);
         n.f3.accept(this, argu);
+        this.resetContext();
         System.out.println("Methods: ");
         n.f4.accept(this, argu);
         n.f5.accept(this, argu);
@@ -107,10 +109,15 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         System.out.println("Class: " + classname);
 
         n.f2.accept(this, argu);
-        n.f3.accept(this, argu);
+        String extendsname = n.f3.accept(this, argu);
+
+        this.symbolTable.insert(classname, "class", 0, extendsname);
+
         n.f4.accept(this, argu);
         System.out.println("Fields: ");
+        this.setContext(classname, 1);
         n.f5.accept(this, argu);
+        this.resetContext();
         System.out.println("Methods: ");
         n.f6.accept(this, argu);
         n.f7.accept(this, argu);
@@ -130,7 +137,7 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         String type = n.f0.accept(this, argu);
         String var = n.f1.accept(this, argu);
         System.out.println(var + " " + type);
-        this.symbolTable.insert(var, type, currentScope, this.currentClass);
+        this.symbolTable.insert(var, type, this.currentScope, this.currentClass);
         // super.visit(n, argu);
         
         return _ret;
