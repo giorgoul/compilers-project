@@ -59,9 +59,11 @@ public class MySymbolTable {
     }
 
     public void addToPath(String name) {
-        this.currentPath.add(name);
+        this.currentPath.addFirst(name);
     }
 
+    // Removes the innermost name from the path,
+    // for example foo -> B turns to B.
     public void removeLastFromPath() {
         this.currentPath.removeFirst();
     }
