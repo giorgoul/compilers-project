@@ -1,3 +1,6 @@
+import java.util.LinkedList;
+import java.util.Optional;
+
 import syntaxtree.*;
 import visitor.*;
 
@@ -5,22 +8,6 @@ import visitor.*;
 class MyVisitor extends GJDepthFirst<String, Void>{
     MySymbolTable symbolTable = new MySymbolTable();
 
-    // Current context for visitors, since I can't edit their
-    // function definitions. Useful for adding variables to the
-    // symbol table.
-
-    String currentClass = "";
-    int currentScope = -1;
-
-    protected void resetContext() {
-        this.currentClass = "";
-        this.currentScope = -1;
-    }
-
-    protected void setContext(String className, int scope) {
-        this.currentClass = className;
-        this.currentScope = scope;
-    }
     /**
      * f0 -> "class"
      * f1 -> Identifier()
@@ -44,19 +31,25 @@ class MyVisitor extends GJDepthFirst<String, Void>{
     @Override
     public String visit(MainClass n, Void argu) throws Exception {
         String classname = n.f1.accept(this, null);
-        // This is a class, so scope is 0
-        this.symbolTable.insert(classname, "mainclass", 0, "-");
+
+        this.symbolTable.insert(classname, "mainclass", "-", "-");
         
         System.out.println("Main variables:");
-        // Add variables to symbolTable. In general, if a similar entry
-        // already exists in the symbolTable (i.e. same identifier, scope AND belongsTo)
+        // Add the main class' variables to symbolTable. In general, if a similar entry
+        // already exists in the symbolTable (i.e. same identifier, scope AND belongsTo path)
         // an exception occurs (TODO)
-        // Set context so that the VarDeclaration visitor adds the correct info to
-        // the symbol table
-        this.setContext(classname, 1);
+        // We're within a method, i.e. scope 2
+        // Current path is main -> classname
+        this.symbolTable.addToPath("main");
+        this.symbolTable.addToPath(classname);
+        this.symbolTable.incrementScope();
+        this.symbolTable.incrementScope();
         n.f14.accept(this, argu);
-        this.resetContext();
-
+        // Revert path done so far and scope
+        this.symbolTable.decrementScope();
+        this.symbolTable.decrementScope();
+        this.symbolTable.removeLastFromPath();
+        this.symbolTable.removeLastFromPath();
         return null;
     }
 
@@ -75,15 +68,17 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         String classname = n.f1.accept(this, argu);
         System.out.println("Class: " + classname);
 
-        this.symbolTable.insert(classname, "class", 0, "-");
+        // this.symbolTable.insert(classname, "class", 0, "-");
 
         n.f2.accept(this, argu);
         System.out.println("Fields: ");
-        this.setContext(classname, 1);
+        // this.setContext(classname, 1);
         n.f3.accept(this, argu);
-        this.resetContext();
+        // this.resetContext();
         System.out.println("Methods: ");
+        // this.setContext(classname, 1);
         n.f4.accept(this, argu);
+        // this.resetContext();
         n.f5.accept(this, argu);
 
         System.out.println();
@@ -111,13 +106,13 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         n.f2.accept(this, argu);
         String extendsname = n.f3.accept(this, argu);
 
-        this.symbolTable.insert(classname, "class", 0, extendsname);
+        // this.symbolTable.insert(classname, "class", 0, extendsname);
 
         n.f4.accept(this, argu);
         System.out.println("Fields: ");
-        this.setContext(classname, 1);
+        // this.setContext(classname, 1);
         n.f5.accept(this, argu);
-        this.resetContext();
+        // this.resetContext();
         System.out.println("Methods: ");
         n.f6.accept(this, argu);
         n.f7.accept(this, argu);
@@ -137,7 +132,7 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         String type = n.f0.accept(this, argu);
         String var = n.f1.accept(this, argu);
         System.out.println(var + " " + type);
-        this.symbolTable.insert(var, type, this.currentScope, this.currentClass);
+        this.symbolTable.insert(var, "var", "-", type);
         // super.visit(n, argu);
         
         return _ret;
@@ -168,7 +163,9 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         System.out.println("Method: " + myType + " " + myName + " (" + argumentList + ")");
         System.out.println("Local vars:");
 
-        super.visit(n, argu);
+        n.f7.accept(this, null);
+
+        // super.visit(n, argu);
         return null;
     }
 
@@ -217,6 +214,7 @@ class MyVisitor extends GJDepthFirst<String, Void>{
     public String visit(FormalParameter n, Void argu) throws Exception{
         String type = n.f0.accept(this, null);
         String name = n.f1.accept(this, null);
+        // this.symbolTable.insert(name, type + "_prm_" + this.currentMethod, this.currentScope, this.currentClass);
         return type + " " + name;
     }
 
