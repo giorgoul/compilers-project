@@ -25,4 +25,12 @@ public class MySymbolTableEntry {
     public LinkedList<String> getBelongsTo() {
         return this.belongsTo;
     }
+
+    public String getKind() {
+        return this.kind;
+    }
+
+    public String getExtend() {
+        return this.extend;
+    }
 }

@@ -7,4 +7,6 @@ compile:
 
 clean:
 	rm -rf *.class syntaxtree visitor minijava-jtb.jj *~
+	rm -rf checks/*.class
+	rm -rf utils/*.class
 

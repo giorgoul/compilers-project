@@ -27,8 +27,9 @@ public class Main {
             root.accept(eval, null);
             eval.symbolTable.print();
             try {
-                // Check for double declarations (for now)
+                // Basic symbol table checks
                 SymbolTableChecks.DoubleDeclarationCheck(eval.symbolTable);
+                SymbolTableChecks.ExtendsBeforeDeclarationCheck(eval.symbolTable);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
