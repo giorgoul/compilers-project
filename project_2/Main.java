@@ -29,6 +29,8 @@ public class Main {
             try {
                 // Basic symbol table checks
                 SymbolTableChecks.DoubleDeclarationCheck(eval.symbolTable);
+                // Relatively weaker check, goes before the declaration one
+                SymbolTableChecks.ExtendedClassExistsCheck(eval.symbolTable);
                 SymbolTableChecks.ExtendsBeforeDeclarationCheck(eval.symbolTable);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
