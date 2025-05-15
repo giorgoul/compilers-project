@@ -15,16 +15,12 @@ public class MySymbolTable {
     // more relevant to the symbol table
     protected int currentScope;
     // Helps build the belongsTo path
-    protected String currentClassName;
-    protected String currentMethodName;
     protected LinkedList<String> currentPath;
 
     
     public MySymbolTable() {
        this.table = new Vector<>();
        this.currentScope = 0;
-       this.currentClassName = "";
-       this.currentMethodName = "";
        this.currentPath = new LinkedList<>();
     }
 
@@ -40,22 +36,6 @@ public class MySymbolTable {
 
     public void decrementScope() {
         this.currentScope--;
-    }
-
-    public void setClassName(String name) {
-        this.currentClassName = name;
-    }
-
-    public void setMethodName(String name) {
-        this.currentMethodName = name;
-    }
-
-    public String getClassName() {
-        return this.currentClassName;
-    }
-
-    public String getMethodName() {
-        return this.currentMethodName;
     }
 
     public void addToPath(String name) {
