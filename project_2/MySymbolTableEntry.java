@@ -1,11 +1,17 @@
+import java.util.LinkedList;
+
 public class MySymbolTableEntry {
-    String id;
+    String identifier;
+    String kind;
+    String extend;
     String type;
     int scope;
-    String belongsTo;
+    LinkedList<String> belongsTo;
 
-    public MySymbolTableEntry(String identifier, String type, int scope, String belongsTo) {
-        this.id = identifier;
+    public MySymbolTableEntry(String identifier, String kind, String extend, String type, int scope, LinkedList<String> belongsTo) {
+        this.identifier = identifier;
+        this.kind = kind;
+        this.extend = extend;
         this.type = type;
         this.scope = scope;
         this.belongsTo = belongsTo;
