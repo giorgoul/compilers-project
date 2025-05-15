@@ -112,6 +112,9 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         n.f5.accept(this, argu);
 
         n.f6.accept(this, argu);
+
+        this.symbolTable.removeLastFromPath();
+        this.symbolTable.decrementScope();
         
         n.f7.accept(this, argu);
 
