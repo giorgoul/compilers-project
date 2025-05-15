@@ -125,7 +125,12 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         String _ret=null;
         String type = n.f0.accept(this, argu);
         String var = n.f1.accept(this, argu);
-        this.symbolTable.insert(var, "var", "-", type);
+        // Class field
+        if (this.symbolTable.getScope() == 1)
+            this.symbolTable.insert(var, "field", "-", type);
+        // Method local variable
+        if (this.symbolTable.getScope() == 2)
+            this.symbolTable.insert(var, "var", "-", type);
         
         return _ret;
     }

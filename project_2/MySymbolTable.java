@@ -38,6 +38,10 @@ public class MySymbolTable {
         this.currentScope--;
     }
 
+    public int getScope() {
+        return this.currentScope;
+    }
+
     public void addToPath(String name) {
         this.currentPath.addFirst(name);
     }
