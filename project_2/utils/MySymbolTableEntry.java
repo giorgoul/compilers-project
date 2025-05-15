@@ -1,3 +1,4 @@
+package utils;
 import java.util.LinkedList;
 
 public class MySymbolTableEntry {
@@ -15,5 +16,13 @@ public class MySymbolTableEntry {
         this.type = type;
         this.scope = scope;
         this.belongsTo = belongsTo;
+    }
+
+    public String getIdentifier() {
+        return this.identifier;
+    }
+
+    public LinkedList<String> getBelongsTo() {
+        return this.belongsTo;
     }
 }

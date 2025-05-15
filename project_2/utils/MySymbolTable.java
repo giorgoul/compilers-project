@@ -1,3 +1,4 @@
+package utils;
 import java.util.LinkedList;
 import java.util.Vector;
 
@@ -44,6 +45,10 @@ public class MySymbolTable {
 
     public void addToPath(String name) {
         this.currentPath.addFirst(name);
+    }
+
+    public Vector<MySymbolTableEntry> getSymbolTable() {
+        return this.table;
     }
 
     // Removes the innermost name from the path,

@@ -2,11 +2,13 @@ import java.util.LinkedList;
 import java.util.Optional;
 
 import syntaxtree.*;
+import utils.MySymbolTable;
 import visitor.*;
 
 
 class MyVisitor extends GJDepthFirst<String, Void>{
     MySymbolTable symbolTable = new MySymbolTable();
+
 
     /**
      * f0 -> "class"

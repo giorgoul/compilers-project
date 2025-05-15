@@ -1,6 +1,8 @@
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import checks.SymbolTableChecks;
 import syntaxtree.*;
 
 public class Main {
@@ -24,6 +26,12 @@ public class Main {
             MyVisitor eval = new MyVisitor();
             root.accept(eval, null);
             eval.symbolTable.print();
+            try {
+                // Check for double declarations (for now)
+                SymbolTableChecks.DoubleDeclarationCheck(eval.symbolTable);
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
         }
         catch(ParseException ex){
             System.out.println(ex.getMessage());
