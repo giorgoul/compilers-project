@@ -95,10 +95,15 @@ public class MySymbolTable {
 
         for (MySymbolTableEntry entry : this.table) {
             System.out.print(entry.identifier + "," + entry.kind + "," + entry.extend + "," + entry.type + "," + entry.scope + ",");
-            for (String path : entry.belongsTo) {
-                System.out.print(path + "->");
+            if (entry.belongsTo.isEmpty()) {
+                System.out.print("-");
+            } else {
+                for (String path : entry.belongsTo) {
+                    System.out.print(path + "->");
+                }
+                // Don't print trailing ->
+                System.out.print("\b\b  ");
             }
-            System.out.print("\b\b  ");
             System.out.println();
         }
     }
