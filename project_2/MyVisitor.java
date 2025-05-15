@@ -39,8 +39,8 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         // an exception occurs (TODO)
         // We're within a method, i.e. scope 2
         // Current path is main -> classname
-        this.symbolTable.addToPath("main");
         this.symbolTable.addToPath(classname);
+        this.symbolTable.addToPath("main");
         this.symbolTable.incrementScope();
         this.symbolTable.incrementScope();
         n.f14.accept(this, argu);
