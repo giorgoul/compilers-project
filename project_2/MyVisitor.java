@@ -34,7 +34,6 @@ class MyVisitor extends GJDepthFirst<String, Void>{
 
         this.symbolTable.insert(classname, "mainclass", "-", "-");
         
-        System.out.println("Main variables:");
         // Add the main class' variables to symbolTable. In general, if a similar entry
         // already exists in the symbolTable (i.e. same identifier, scope AND belongsTo path)
         // an exception occurs (TODO)
@@ -66,22 +65,19 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         n.f0.accept(this, argu);
         
         String classname = n.f1.accept(this, argu);
-        System.out.println("Class: " + classname);
-
-        // this.symbolTable.insert(classname, "class", 0, "-");
+        this.symbolTable.insert(classname, "class", "-", "-");
 
         n.f2.accept(this, argu);
-        System.out.println("Fields: ");
-        // this.setContext(classname, 1);
-        n.f3.accept(this, argu);
-        // this.resetContext();
-        System.out.println("Methods: ");
-        // this.setContext(classname, 1);
-        n.f4.accept(this, argu);
-        // this.resetContext();
-        n.f5.accept(this, argu);
 
-        System.out.println();
+        this.symbolTable.incrementScope();
+        this.symbolTable.addToPath(classname);
+        n.f3.accept(this, argu);
+        n.f4.accept(this, argu);
+
+        this.symbolTable.removeLastFromPath();
+        this.symbolTable.decrementScope();
+
+        n.f5.accept(this, argu);
 
         return null;
     }
@@ -101,23 +97,21 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         n.f0.accept(this, argu);
 
         String classname = n.f1.accept(this, null);
-        System.out.println("Class: " + classname);
 
         n.f2.accept(this, argu);
         String extendsname = n.f3.accept(this, argu);
 
-        // this.symbolTable.insert(classname, "class", 0, extendsname);
+        this.symbolTable.insert(classname, "class", extendsname, "-");
 
         n.f4.accept(this, argu);
-        System.out.println("Fields: ");
-        // this.setContext(classname, 1);
-        n.f5.accept(this, argu);
-        // this.resetContext();
-        System.out.println("Methods: ");
-        n.f6.accept(this, argu);
-        n.f7.accept(this, argu);
 
-        System.out.println();
+        this.symbolTable.incrementScope();
+        this.symbolTable.addToPath(classname);
+        n.f5.accept(this, argu);
+
+        n.f6.accept(this, argu);
+        
+        n.f7.accept(this, argu);
 
         return null;
     }
@@ -131,9 +125,7 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         String _ret=null;
         String type = n.f0.accept(this, argu);
         String var = n.f1.accept(this, argu);
-        System.out.println(var + " " + type);
         this.symbolTable.insert(var, "var", "-", type);
-        // super.visit(n, argu);
         
         return _ret;
     }
@@ -155,17 +147,23 @@ class MyVisitor extends GJDepthFirst<String, Void>{
      */
     @Override
     public String visit(MethodDeclaration n, Void argu) throws Exception {
-        String argumentList = n.f4.present() ? n.f4.accept(this, null) : "";
-
         String myType = n.f1.accept(this, null);
         String myName = n.f2.accept(this, null);
 
-        System.out.println("Method: " + myType + " " + myName + " (" + argumentList + ")");
-        System.out.println("Local vars:");
+        this.symbolTable.insert(myName, "method", "-", myType);
+
+        this.symbolTable.incrementScope();
+        this.symbolTable.addToPath(myName);
+
+        if (n.f4.present()) {
+            n.f4.accept(this, null);
+        }
 
         n.f7.accept(this, null);
 
-        // super.visit(n, argu);
+        this.symbolTable.removeLastFromPath();
+        this.symbolTable.decrementScope();
+
         return null;
     }
 
@@ -214,7 +212,7 @@ class MyVisitor extends GJDepthFirst<String, Void>{
     public String visit(FormalParameter n, Void argu) throws Exception{
         String type = n.f0.accept(this, null);
         String name = n.f1.accept(this, null);
-        // this.symbolTable.insert(name, type + "_prm_" + this.currentMethod, this.currentScope, this.currentClass);
+        this.symbolTable.insert(name, "param", "-", type);
         return type + " " + name;
     }
 
