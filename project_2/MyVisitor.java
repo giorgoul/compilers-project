@@ -35,22 +35,18 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         String classname = n.f1.accept(this, null);
 
         this.symbolTable.insert(classname, "mainclass", "-", "-");
-        
-        // Add the main class' variables to symbolTable. In general, if a similar entry
-        // already exists in the symbolTable (i.e. same identifier, scope AND belongsTo path)
-        // an exception occurs (TODO)
         // We're within a method, i.e. scope 2
         // Current path is main -> classname
-        this.symbolTable.addToPath(classname);
-        this.symbolTable.addToPath("main");
-        this.symbolTable.incrementScope();
-        this.symbolTable.incrementScope();
+        this.symbolTable.getContext().addToPath(classname);
+        this.symbolTable.getContext().addToPath("main");
+        this.symbolTable.getContext().incrementScope();
+        this.symbolTable.getContext().incrementScope();
         n.f14.accept(this, argu);
         // Revert path done so far and scope
-        this.symbolTable.decrementScope();
-        this.symbolTable.decrementScope();
-        this.symbolTable.removeLastFromPath();
-        this.symbolTable.removeLastFromPath();
+        this.symbolTable.getContext().decrementScope();
+        this.symbolTable.getContext().decrementScope();
+        this.symbolTable.getContext().removeLastFromPath();
+        this.symbolTable.getContext().removeLastFromPath();
         return null;
     }
 
@@ -71,13 +67,13 @@ class MyVisitor extends GJDepthFirst<String, Void>{
 
         n.f2.accept(this, argu);
 
-        this.symbolTable.incrementScope();
-        this.symbolTable.addToPath(classname);
+        this.symbolTable.getContext().incrementScope();
+        this.symbolTable.getContext().addToPath(classname);
         n.f3.accept(this, argu);
         n.f4.accept(this, argu);
 
-        this.symbolTable.removeLastFromPath();
-        this.symbolTable.decrementScope();
+        this.symbolTable.getContext().removeLastFromPath();
+        this.symbolTable.getContext().decrementScope();
 
         n.f5.accept(this, argu);
 
@@ -107,14 +103,14 @@ class MyVisitor extends GJDepthFirst<String, Void>{
 
         n.f4.accept(this, argu);
 
-        this.symbolTable.incrementScope();
-        this.symbolTable.addToPath(classname);
+        this.symbolTable.getContext().incrementScope();
+        this.symbolTable.getContext().addToPath(classname);
         n.f5.accept(this, argu);
 
         n.f6.accept(this, argu);
 
-        this.symbolTable.removeLastFromPath();
-        this.symbolTable.decrementScope();
+        this.symbolTable.getContext().removeLastFromPath();
+        this.symbolTable.getContext().decrementScope();
         
         n.f7.accept(this, argu);
 
@@ -131,10 +127,10 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         String type = n.f0.accept(this, argu);
         String var = n.f1.accept(this, argu);
         // Class field
-        if (this.symbolTable.getScope() == 1)
+        if (this.symbolTable.getContext().getScope() == 1)
             this.symbolTable.insert(var, "field", "-", type);
         // Method local variable
-        if (this.symbolTable.getScope() == 2)
+        if (this.symbolTable.getContext().getScope() == 2)
             this.symbolTable.insert(var, "var", "-", type);
         
         return _ret;
@@ -162,8 +158,8 @@ class MyVisitor extends GJDepthFirst<String, Void>{
 
         this.symbolTable.insert(myName, "method", "-", myType);
 
-        this.symbolTable.incrementScope();
-        this.symbolTable.addToPath(myName);
+        this.symbolTable.getContext().incrementScope();
+        this.symbolTable.getContext().addToPath(myName);
 
         if (n.f4.present()) {
             n.f4.accept(this, null);
@@ -171,8 +167,8 @@ class MyVisitor extends GJDepthFirst<String, Void>{
 
         n.f7.accept(this, null);
 
-        this.symbolTable.removeLastFromPath();
-        this.symbolTable.decrementScope();
+        this.symbolTable.getContext().removeLastFromPath();
+        this.symbolTable.getContext().decrementScope();
 
         return null;
     }

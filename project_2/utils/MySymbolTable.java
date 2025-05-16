@@ -12,49 +12,25 @@ import java.util.Vector;
 
 public class MySymbolTable {
     protected Vector<MySymbolTableEntry> table;
-    // Better to keep the current context in here as it's
-    // more relevant to the symbol table
-    protected int currentScope;
-    // Helps build the belongsTo path
-    protected LinkedList<String> currentPath;
-
-    
+    protected Context context;
+   
     public MySymbolTable() {
        this.table = new Vector<>();
-       this.currentScope = 0;
-       this.currentPath = new LinkedList<>();
+       this.context = new Context();
     }
 
     public void insert(String identifier, String kind, String extend, String type) {
         // Deep copy of currentPath so it stays the same even after updating this.currentPath
-        MySymbolTableEntry to_insert = new MySymbolTableEntry(identifier, kind, extend, type, this.currentScope, new LinkedList<>(currentPath));
+        MySymbolTableEntry to_insert = new MySymbolTableEntry(identifier, kind, extend, type, this.context.getScope(), new LinkedList<>(this.context.getPath()));
         this.table.add(to_insert);
-    }
-
-    public void incrementScope() {
-        this.currentScope++;
-    }
-
-    public void decrementScope() {
-        this.currentScope--;
-    }
-
-    public int getScope() {
-        return this.currentScope;
-    }
-
-    public void addToPath(String name) {
-        this.currentPath.addFirst(name);
     }
 
     public Vector<MySymbolTableEntry> getSymbolTable() {
         return this.table;
     }
 
-    // Removes the innermost name from the path,
-    // for example foo -> B turns to B.
-    public void removeLastFromPath() {
-        this.currentPath.removeFirst();
+    public Context getContext() {
+        return this.context;
     }
 
     public int numOfOccurencies(String identifier) {
@@ -90,7 +66,7 @@ public class MySymbolTable {
                 for (String path : entry.belongsTo) {
                     System.out.print(path + "->");
                 }
-                // Don't print trailing ->
+                // Don't print trailing -> (terminal dependent)
                 System.out.print("\b\b  ");
             }
             System.out.println();
