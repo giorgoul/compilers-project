@@ -69,4 +69,23 @@ public class SymbolTableChecks {
             }
         }
     }
+
+    public static void TypeExistsCheck(MySymbolTable table) throws Exception {
+        for (MySymbolTableEntry entry : table.getSymbolTable()) {
+            if (entry.getKind().equals("var") || entry.getKind().equals("field") || entry.getKind().equals("param"))
+                // int, int[], boolean, boolean[] always exist
+                if (entry.getType().equals("int") || entry.getType().equals("int[]") || entry.getType().equals("boolean") || entry.getType().equals("boolean[]")) {
+                    continue;
+                } else {
+                    boolean found = false;
+                    for (MySymbolTableEntry entry2 : table.getSymbolTable()) {
+                        if (entry2.getKind().equals("class"))
+                            if (entry2.getIdentifier().equals(entry.getType()))
+                                found = true;
+                    }
+                    if (!found)
+                        throw new Exception("Semantic Error: Type " + entry.getType() + " doesn't exist");
+                }
+        }
+    }
 }

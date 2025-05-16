@@ -33,4 +33,8 @@ public class MySymbolTableEntry {
     public String getExtend() {
         return this.extend;
     }
+
+    public String getType() {
+        return this.type;
+    }
 }
