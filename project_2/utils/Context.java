@@ -40,29 +40,3 @@ public class Context {
         return this.currentPath;
     }
 }
-
-class VisitorContext extends Context {
-    protected String currentClass;
-    protected String currentMethod;
-
-    public VisitorContext() {
-        this.currentClass = "";
-        this.currentMethod = "";
-    }
-
-    public String getCurrentClass() {
-        return this.currentClass;
-    }
-
-    public String getCurrentMethod() {
-        return this.currentMethod;
-    }
-
-    public void setCurrentClass(String classname) {
-        this.currentClass = classname;
-    }
-
-    public void setCurrentMethod(String methodname) {
-        this.currentMethod = methodname;
-    }
-}
