@@ -36,6 +36,8 @@ public class Main {
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
+            MySecondVisitor eval2 = new MySecondVisitor(eval.symbolTable);
+            root.accept(eval2, null);
         }
         catch(ParseException ex){
             System.out.println(ex.getMessage());
