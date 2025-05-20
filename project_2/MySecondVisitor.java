@@ -364,7 +364,9 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(PrimaryExpression n, Void argu) throws Exception {
-        return n.f0.accept(this, argu);
+        String type = n.f0.accept(this, argu);
+        System.out.println(type);
+        return type;
     }
 
     /**
@@ -393,25 +395,23 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     /**
         * f0 -> <IDENTIFIER>
     */
-    // Returns string representation of identifier
+    // Returns string representation of identifier OR its type
+    // depending on the context
     @Override
     public String visit(Identifier n, Void argu) {
         String identifier = n.f0.toString();
-        if (this.context.getIdentifierRetruns().equals("string")) {
+        if (this.context.getIdentifierReturns().equals("string")) {
             return identifier;
-        } else if (this.context.getIdentifierRetruns().equals("type")) {
+        } else if (this.context.getIdentifierReturns().equals("type")) {
             // Find the type based on current context
             for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
                 // First search within the scope of the method
                 if (entry.getIdentifier().equals(identifier)) {
-                    System.out.println("Found var " + entry.getIdentifier());
-                    System.out.println("Current class: " + this.context.getCurrentClass());
-                    System.out.println("Current method: " + this.context.getCurrentMethod());
+                    // TODO: work properly for methods
                     LinkedList<String> path = entry.getBelongsTo();
                     Iterator<String> path_iterator = path.iterator();
                     if (path_iterator.next().equals(this.context.getCurrentMethod())) {
                         if (path_iterator.next().equals(this.context.getCurrentClass())) {
-                            System.out.println(identifier + " has type " + entry.getType());
                             return entry.getType();
                         }
                     }
@@ -425,7 +425,8 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         * f0 -> "this"
     */
     public String visit(ThisExpression n, Void argu) throws Exception {
-        return n.f0.accept(this, argu);
+        // "this" refers to the current class, so just return currentClass
+        return this.context.getCurrentClass();
     }
 
     /**
@@ -449,9 +450,12 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         n.f2.accept(this, argu);
-        n.f3.accept(this, argu);
+        String type = n.f3.accept(this, argu);
+        if (!type.equals("int")) {
+            throw new Exception("Semantic error: Indices must be of type int");
+        }
         n.f4.accept(this, argu);
-        return null;
+        return "boolean[]";
     }
 
     /**
@@ -466,9 +470,12 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         n.f2.accept(this, argu);
-        n.f3.accept(this, argu);
+        String type = n.f3.accept(this, argu);
+        if (!type.equals("int")) {
+            throw new Exception("Semantic error: Indices must be of type int");
+        }
         n.f4.accept(this, argu);
-        return null;
+        return "int[]";
     }
 
     /**
@@ -479,11 +486,16 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(AllocationExpression n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        n.f3.accept(this, argu);
-        return null;
+        // Search class that matches f1
+        this.context.setIdentifierReturns("string");
+        String identifier = n.f1.accept(this, argu);
+        // If class doesn't exist, throw exception
+        for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
+            if (entry.getIdentifier().equals(identifier) && (entry.getKind().equals("class") || entry.getKind().equals("mainclass"))) {
+                return entry.getIdentifier();
+            }
+        }
+        throw new Exception("Semantic error: Class " + identifier + " doesn't exist");
     }
 
     /**

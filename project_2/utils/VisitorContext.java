@@ -22,7 +22,7 @@ public class VisitorContext extends Context {
         return this.currentMethod;
     }
 
-    public String getIdentifierRetruns() {
+    public String getIdentifierReturns() {
         return this.identifierReturns;
     }
 
