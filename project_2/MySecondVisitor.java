@@ -92,8 +92,10 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(AssignmentStatement n, Void argu) throws Exception {
+        // TODO: Is expression's type compatible with identifier?
+        this.context.setIdentifierReturns("string");
         String identifier = n.f0.accept(this, argu);
-        n.f2.accept(this, argu);
+        String type = n.f2.accept(this, argu);
         n.f3.accept(this, argu);
         return null;
     }
@@ -197,10 +199,14 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(AndExpression n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
+        String type1 = n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        return null;
+        String type2 = n.f2.accept(this, argu);
+        if (!type1.equals("boolean") || !type2.equals("boolean")) {
+            throw new Exception("Semantic error: Logical and expression must have boolean clauses");
+        }
+        // Result of logical and is a boolean
+        return "boolean";
     }
 
     /**
@@ -210,10 +216,13 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(CompareExpression n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
+        String type1 = n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        return null;
+        String type2 = n.f2.accept(this, argu);
+        if (!type1.equals("int") || !type2.equals("int")) {
+            throw new Exception("Semantic error: Can only compare ints");
+        }
+        return "boolean";
     }
 
     /**
@@ -223,10 +232,13 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(PlusExpression n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
+        String type1 = n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        return null;
+        String type2 = n.f2.accept(this, argu);
+        if (!type1.equals("int") || !type2.equals("int")) {
+            throw new Exception("Semantic error: Can only add ints");
+        }
+        return "int";
     }
 
     /**
@@ -236,10 +248,13 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(MinusExpression n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
+        String type1 = n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        return null;
+        String type2 = n.f2.accept(this, argu);
+        if (!type1.equals("int") || !type2.equals("int")) {
+            throw new Exception("Semantic error: Can only subtract ints");
+        }
+        return "int";
     }
 
     /**
@@ -249,10 +264,13 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(TimesExpression n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
+        String type1 = n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        return null;
+        String type2 = n.f2.accept(this, argu);
+        if (!type1.equals("int") || !type2.equals("int")) {
+            throw new Exception("Semantic error: Can only multiply ints");
+        }
+        return "int";
     }
 
     /**
@@ -348,8 +366,11 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     @Override
     public String visit(NotExpression n, Void argu) throws Exception {
         n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        return null;
+        String type = n.f1.accept(this, argu);
+        if (!type.equals("boolean")) {
+            throw new Exception("Semantic error: Clause doesn't evaluate to boolean type");
+        }
+        return type;
     }
 
     /**
@@ -365,7 +386,6 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     @Override
     public String visit(PrimaryExpression n, Void argu) throws Exception {
         String type = n.f0.accept(this, argu);
-        System.out.println(type);
         return type;
     }
 
@@ -506,9 +526,9 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     @Override
     public String visit(BracketExpression n, Void argu) throws Exception {
         n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
+        String type = n.f1.accept(this, argu);
         n.f2.accept(this, argu);
-        return null;
+        return type;
     }
 
     /**
@@ -570,6 +590,8 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
    public String visit(VarDeclaration n, Void argu) throws Exception {
         String _ret=null;
         String type = n.f0.accept(this, argu);
+        // For consistency
+        this.context.setIdentifierReturns("string");
         String var = n.f1.accept(this, argu);
         
         return _ret;
