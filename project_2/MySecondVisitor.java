@@ -209,6 +209,9 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         if (type1.equals("")) {
             throw new Exception("Semantic Error: Identifier doesn't exist");
         }
+        if (!type1.equals("int[]") && !type1.equals("boolean[]")) {
+            throw new Exception("Semantic Error: Assigning value to non-array");
+        }
         this.context.setIdentifierReturns("type");
         String type2 = n.f2.accept(this, argu);
         if (!type2.equals("int")) {
@@ -383,11 +386,21 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(ArrayLookup n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        n.f3.accept(this, argu);
-        return null;
+        this.context.setIdentifierReturns("type");
+        String type1 = n.f0.accept(this, argu);
+        System.out.println("Type1: " + type1);
+        if (!type1.equals("int[]") && !type1.equals("boolean[]")) {
+            throw new Exception("Semantic error: Array access on non-array");
+        }
+        String type2 = n.f2.accept(this, argu);
+        System.out.println("Type2: " + type2);
+        if (!type2.equals("int")) {
+            throw new Exception("Semantic error: Indices must be of type int");
+        }
+        if (type1.equals("int[]")) {
+            return "int";
+        }
+        return "boolean";
     }
 
     /**
@@ -397,10 +410,12 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(ArrayLength n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        return null;
+        this.context.setIdentifierReturns("type");
+        String type = n.f0.accept(this, argu);
+        if (!type.equals("int[]") && !type.equals("boolean[]")) {
+            throw new Exception("Semantic Error: Can't use .length on non-array");
+        }
+        return "int";
     }
 
     /**
