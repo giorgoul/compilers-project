@@ -92,10 +92,78 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(AssignmentStatement n, Void argu) throws Exception {
-        // TODO: Is expression's type compatible with identifier?
         this.context.setIdentifierReturns("string");
         String identifier = n.f0.accept(this, argu);
-        String type = n.f2.accept(this, argu);
+        // Find type of identifier (based on context)
+        // Similar code to below visitor, will refactor (TODO)
+        String type1 = "";
+        for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
+            if (entry.getIdentifier().equals(identifier)) {
+                LinkedList<String> path = entry.getBelongsTo();
+                Iterator<String> path_iterator = path.iterator();
+                if (path_iterator.next().equals(this.context.getCurrentMethod())) {
+                    if (path_iterator.next().equals(this.context.getCurrentClass())) {
+                        type1 = entry.getType();
+                        break;
+                    }
+                }
+            }
+        }
+        if (type1.equals("")) {
+            // If not found within the method, search the whole class
+            for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
+                if (entry.getIdentifier().equals(identifier) && entry.getScope() == 1) {
+                    LinkedList<String> path = entry.getBelongsTo();
+                    Iterator<String> path_iterator = path.iterator();
+                    if (path_iterator.next().equals(this.context.getCurrentClass())) {
+                        type1 = entry.getType();
+                        break;
+                    }
+                }
+            }
+        }
+        if (type1.equals("")) {
+            throw new Exception("Semantic Error: Identifier doesn't exist");
+        }
+
+        this.context.setIdentifierReturns("type");
+        String type2 = n.f2.accept(this, argu);
+
+        if (!type1.equals(type2)) {
+            // Handle other cases first
+            if ((type1.equals("int") && !type2.equals("int")) || (!type1.equals("int") && type2.equals("int"))) {
+                throw new Exception("Semantic error: Incompatible type when assigning to variable");
+            }
+            if ((type1.equals("int[]") && !type2.equals("int[]")) || (!type1.equals("int[]") && type2.equals("int[]"))) {
+                throw new Exception("Semantic error: Incompatible type when assigning to variable");
+            }
+            if ((type1.equals("boolean") && !type2.equals("boolean")) || (!type1.equals("boolean") && type2.equals("boolean"))) {
+                throw new Exception("Semantic error: Incompatible type when assigning to variable");
+            }
+            if ((type1.equals("boolean[]") && !type2.equals("boolean[]")) || (!type1.equals("boolean[]") && type2.equals("boolean[]"))) {
+                throw new Exception("Semantic error: Incompatible type when assigning to variable");
+            }
+            // Check for inheritance, is f0's type a parent of f2's type?
+            // Go up the chain of inheritances until type is found (success)
+            // or until there isn't another parent class (fail)
+            String classToFind = type2;
+            boolean done = false;
+            while (!done) {
+                for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
+                    if (entry.getKind().equals("class") && entry.getIdentifier().equals(classToFind)) {
+                        if (entry.getExtend().equals("-")) {
+                            throw new Exception("Semantic error: Incompatible type when assigning to variable");
+                        }
+                        if (entry.getExtend().equals(type1)) {
+                            done = true;
+                            break;
+                        }
+                        classToFind = entry.getExtend();
+                        break;
+                    }
+                }
+            }
+        }
         n.f3.accept(this, argu);
         return null;
     }

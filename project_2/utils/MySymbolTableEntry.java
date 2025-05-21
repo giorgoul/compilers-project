@@ -37,4 +37,8 @@ public class MySymbolTableEntry {
     public String getType() {
         return this.type;
     }
+
+    public int getScope() {
+        return this.scope;
+    }
 }
