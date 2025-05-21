@@ -577,7 +577,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     // Returns string representation of identifier OR its type
     // depending on the context
     @Override
-    public String visit(Identifier n, Void argu) {
+    public String visit(Identifier n, Void argu) throws Exception {
         String identifier = n.f0.toString();
         if (this.context.getIdentifierReturns().equals("string")) {
             return identifier;
@@ -586,7 +586,6 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
             for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
                 // First search within the scope of the method
                 if (entry.getIdentifier().equals(identifier)) {
-                    // TODO: work properly for methods
                     LinkedList<String> path = entry.getBelongsTo();
                     Iterator<String> path_iterator = path.iterator();
                     if (path_iterator.next().equals(this.context.getCurrentMethod())) {
@@ -596,6 +595,17 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
                     }
                 }
             }
+            // If not found within method, search within class
+            for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
+                if (entry.getIdentifier().equals(identifier) && entry.getScope() == 1) {
+                    LinkedList<String> path = entry.getBelongsTo();
+                    Iterator<String> path_iterator = path.iterator();
+                    if (path_iterator.next().equals(this.context.getCurrentClass())) {
+                        return entry.getType();
+                    }
+                }
+            }
+            throw new Exception("Semantic Error: Identifier doesn't exist");
         }
         return null;
     }
