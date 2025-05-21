@@ -6,8 +6,8 @@ import java.util.Vector;
  * identifier | kind | extend | type | scope | belongs_to
  * For example, `class A {int x; int y;}` corresponds to
  * A | "class" | "-" | "-" | 0 (always since classes cannot exist within other classes) | empty linked list
- * x | "var"   | "-" | "int" | 1 (within A)      | "A"
- * y | "var"   | "-" | "int" | 1                 | "A"
+ * x | "field"   | "-" | "int" | 1 (within A)      | "A"
+ * y | "field"   | "-" | "int" | 1                 | "A"
  */
 
 public class MySymbolTable {
@@ -31,6 +31,31 @@ public class MySymbolTable {
 
     public Context getContext() {
         return this.context;
+    }
+
+    // Returns a linked list of a method's parameter types, with the method (table entry) as input
+    public LinkedList<String> getParameters(MySymbolTableEntry method) {
+        LinkedList<String> result = new LinkedList<String>();
+        boolean found = false;
+        for (MySymbolTableEntry entry : this.table) {
+            // Unnecessary checks, just want to make sure
+            if (!found) {
+                if (method.getIdentifier().equals(entry.getIdentifier()) && method.getKind().equals(entry.getKind()) &&
+                    method.getExtend().equals(entry.getExtend()) && method.getType().equals(entry.getType()) && method.getScope() == entry.getScope() &&
+                    CompareLinkedLists.compare(method.getBelongsTo(), entry.getBelongsTo())) {
+                    found = true;
+                }
+            } else {
+                // Method parameters are stored right after the method itself, so we keep
+                // adding them until we run into another method or class
+                if (entry.getKind().equals("param")) {
+                    result.add(entry.getType());
+                } else {
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
     public int numOfOccurencies(String identifier) {

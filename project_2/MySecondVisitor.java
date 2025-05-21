@@ -2,6 +2,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import syntaxtree.*;
+import utils.CompareLinkedLists;
 import utils.MySymbolTable;
 import utils.MySymbolTableEntry;
 import utils.VisitorContext;
@@ -428,13 +429,49 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(MessageSend n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        n.f3.accept(this, argu);
+        this.context.setIdentifierReturns("type");
+        String type = n.f0.accept(this, argu);
+        if (type.equals("int") || type.equals("boolean") || type.equals("int[]") || type.equals("boolean[]")) {
+            throw new Exception("Semantic Error: Primitive types don't have methods");
+        }
+        this.context.setIdentifierReturns("string");
+        // Check whether method exists within class type
+        String methodname = n.f2.accept(this, argu);
+        boolean exists = false;
+        String returns = "";
+        LinkedList<String> parameters = new LinkedList<String>();
+        for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
+            if (entry.getIdentifier().equals(methodname) && entry.getKind().equals("method")) {
+                LinkedList<String> path = entry.getBelongsTo();
+                Iterator<String> path_iterator = path.iterator();
+                // Make sure that the first (and only) element of the path is equal to the class name
+                if (path_iterator.next().equals(type)) {
+                    exists = true;
+                    returns = entry.getType();
+                    parameters = this.table.getParameters(entry);
+                }
+            }
+        }
+        if (!exists) {
+            throw new Exception("Semantic Error: Method doesn't exist within class");
+        }
+        // Check if arguments of call match method parameters
         n.f4.accept(this, argu);
-        n.f5.accept(this, argu);
-        return null;
+        // For debugging
+        // System.out.println("Method found has parameters: ");
+        // for (String parameter : parameters) {
+        //     System.out.println(parameter);
+        // }
+        // System.out.println("Method call has arguments: ");
+        // for (String argument : this.context.getTempLinkedList()) {
+        //     System.out.println(argument);
+        // }
+        if (!CompareLinkedLists.compare(parameters, this.context.getTempLinkedList())) {
+            throw new Exception("Semantic error: Method call arguments and method declaration parameters mismatch");
+        }
+        // Reset tempLinkedList for future use
+        this.context.resetTempLinkedList();
+        return returns;
     }
 
     /**
@@ -443,7 +480,10 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(ExpressionList n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
+        this.context.setIdentifierReturns("type");
+        String type = n.f0.accept(this, argu);
+        this.context.getTempLinkedList().add(type);
+        
         n.f1.accept(this, argu);
         return null;
     }
@@ -462,8 +502,10 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(ExpressionTerm n, Void argu) throws Exception {
+        this.context.setIdentifierReturns("type");
         n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
+        String type = n.f1.accept(this, argu);
+        this.context.getTempLinkedList().add(type);
         return null;
     }
 

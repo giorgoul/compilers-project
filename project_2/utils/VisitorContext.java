@@ -1,5 +1,7 @@
 package utils;
 
+import java.util.LinkedList;
+
 public class VisitorContext extends Context {
     protected String currentClass;
     protected String currentMethod;
@@ -7,11 +9,13 @@ public class VisitorContext extends Context {
     // return the string repr. of an identifier or its
     // type
     protected String identifierReturns;
+    protected LinkedList<String> tempLinkedList;
 
     public VisitorContext() {
         this.currentClass = "";
         this.currentMethod = "";
         this.identifierReturns = "";
+        this.tempLinkedList = new LinkedList<String>();
     }
 
     public String getCurrentClass() {
@@ -26,6 +30,10 @@ public class VisitorContext extends Context {
         return this.identifierReturns;
     }
 
+    public LinkedList<String> getTempLinkedList() {
+        return this.tempLinkedList;
+    }
+
     public void setCurrentClass(String classname) {
         this.currentClass = classname;
     }
@@ -36,5 +44,9 @@ public class VisitorContext extends Context {
 
     public void setIdentifierReturns(String returns) {
         this.identifierReturns = returns;
+    }
+
+    public void resetTempLinkedList() {
+        this.tempLinkedList = new LinkedList<String>();
     }
 }
