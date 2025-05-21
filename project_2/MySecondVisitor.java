@@ -389,12 +389,10 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     public String visit(ArrayLookup n, Void argu) throws Exception {
         this.context.setIdentifierReturns("type");
         String type1 = n.f0.accept(this, argu);
-        System.out.println("Type1: " + type1);
         if (!type1.equals("int[]") && !type1.equals("boolean[]")) {
             throw new Exception("Semantic error: Array access on non-array");
         }
         String type2 = n.f2.accept(this, argu);
-        System.out.println("Type2: " + type2);
         if (!type2.equals("int")) {
             throw new Exception("Semantic error: Indices must be of type int");
         }
@@ -458,14 +456,16 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         // Check if arguments of call match method parameters
         n.f4.accept(this, argu);
         // For debugging
-        // System.out.println("Method found has parameters: ");
-        // for (String parameter : parameters) {
-        //     System.out.println(parameter);
-        // }
-        // System.out.println("Method call has arguments: ");
-        // for (String argument : this.context.getTempLinkedList()) {
-        //     System.out.println(argument);
-        // }
+        System.out.println("Found method: " + methodname);
+        System.out.println("Method found has parameters: ");
+        for (String parameter : parameters) {
+            System.out.println(parameter);
+        }
+        System.out.println("Method call has arguments: ");
+        for (String argument : this.context.getTempLinkedList()) {
+            System.out.println(argument);
+        }
+        // TODO: for each argument check whether it's a subclass of the method parameter
         if (!CompareLinkedLists.compare(parameters, this.context.getTempLinkedList())) {
             throw new Exception("Semantic error: Method call arguments and method declaration parameters mismatch");
         }
@@ -710,14 +710,13 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
      */
     @Override
     public String visit(ClassDeclaration n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-        
+        this.context.setIdentifierReturns("string");
         String classname = n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        n.f3.accept(this, argu);
+        this.context.incrementScope();
+        this.context.setCurrentClass(classname);
         n.f4.accept(this, argu);
-
-        n.f5.accept(this, argu);
+        this.context.setCurrentClass("");
+        this.context.decrementScope();
 
         return null;
     }
@@ -734,20 +733,13 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
      */
     @Override
     public String visit(ClassExtendsDeclaration n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-
+        this.context.setIdentifierReturns("string");
         String classname = n.f1.accept(this, null);
-
-        n.f2.accept(this, argu);
-        String extendsname = n.f3.accept(this, argu);
-
-        n.f4.accept(this, argu);
-        n.f5.accept(this, argu);
-
+        this.context.incrementScope();
+        this.context.setCurrentClass(classname);
         n.f6.accept(this, argu);
-        
-        n.f7.accept(this, argu);
-
+        this.context.setCurrentClass("");
+        this.context.decrementScope();
         return null;
     }
 
@@ -783,13 +775,24 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
      */
     @Override
     public String visit(MethodDeclaration n, Void argu) throws Exception {
-        String myType = n.f1.accept(this, null);
-        String myName = n.f2.accept(this, null);
+        this.context.setIdentifierReturns("string");
+        String returns = n.f1.accept(this, null);
+        String methodname = n.f2.accept(this, null);
+        this.context.incrementScope();
+        this.context.setCurrentMethod(methodname);
 
         n.f4.accept(this, null);
 
         n.f7.accept(this, null);
-
+        n.f8.accept(this, null);
+        this.context.setIdentifierReturns("type");
+        String type = n.f10.accept(this, null);
+        // TODO: Check whether type is a subclass of returns 
+        if (!type.equals(returns)) {
+            throw new Exception("Semantic Error: Method type and return expression mismatch");
+        }
+        this.context.decrementScope();
+        this.context.setCurrentMethod("");
         return null;
     }
 
