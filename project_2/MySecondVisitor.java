@@ -232,12 +232,13 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(IfStatement n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        n.f3.accept(this, argu);
+
+        this.context.setIdentifierReturns("type");
+        String type = n.f2.accept(this, argu);
+        if (!type.equals("boolean")) {
+            throw new Exception("Semantic Error: If condition is not boolean");
+        }
         n.f4.accept(this, argu);
-        n.f5.accept(this, argu);
         n.f6.accept(this, argu);
         return null;
     }
@@ -251,10 +252,11 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(WhileStatement n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        n.f3.accept(this, argu);
+        this.context.setIdentifierReturns("type");
+        String type = n.f2.accept(this, argu);
+        if (!type.equals("boolean")) {
+            throw new Exception("Semantic Error: While condition is not boolean");
+        }
         n.f4.accept(this, argu);
         return null;
     }
@@ -268,11 +270,11 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(PrintStatement n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        n.f3.accept(this, argu);
-        n.f4.accept(this, argu);
+        this.context.setIdentifierReturns("type");
+        String type = n.f2.accept(this, argu);
+        if (!type.equals("int")) {
+            throw new Exception("Semantic Error: Can only print int");
+        }
         return null;
     }
 
