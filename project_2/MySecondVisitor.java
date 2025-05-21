@@ -179,13 +179,45 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(ArrayAssignmentStatement n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
-        n.f3.accept(this, argu);
-        n.f4.accept(this, argu);
-        n.f5.accept(this, argu);
-        n.f6.accept(this, argu);
+        this.context.setIdentifierReturns("string");
+        String identifier = n.f0.accept(this, argu);
+        String type1 = "";
+        for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
+            if (entry.getIdentifier().equals(identifier)) {
+                LinkedList<String> path = entry.getBelongsTo();
+                Iterator<String> path_iterator = path.iterator();
+                if (path_iterator.next().equals(this.context.getCurrentMethod())) {
+                    if (path_iterator.next().equals(this.context.getCurrentClass())) {
+                        type1 = entry.getType();
+                        break;
+                    }
+                }
+            }
+        }
+        if (type1.equals("")) {
+            for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
+                if (entry.getIdentifier().equals(identifier) && entry.getScope() == 1) {
+                    LinkedList<String> path = entry.getBelongsTo();
+                    Iterator<String> path_iterator = path.iterator();
+                    if (path_iterator.next().equals(this.context.getCurrentClass())) {
+                        type1 = entry.getType();
+                        break;
+                    }
+                }
+            }
+        }
+        if (type1.equals("")) {
+            throw new Exception("Semantic Error: Identifier doesn't exist");
+        }
+        this.context.setIdentifierReturns("type");
+        String type2 = n.f2.accept(this, argu);
+        if (!type2.equals("int")) {
+            throw new Exception("Semantic error: Indices must be of type int");
+        }
+        String type3 = n.f5.accept(this, argu);
+        if ((type1.equals("int[]") && !type3.equals("int")) || (type1.equals("boolean[]") && !type3.equals("boolean"))) {
+            throw new Exception("Semantic error: Incompatible type when assigning to array member");
+        }
         return null;
     }
 
