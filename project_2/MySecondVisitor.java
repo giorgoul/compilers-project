@@ -172,6 +172,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         if (!type1.equals("int[]") && !type1.equals("boolean[]")) {
             throw new Exception("Semantic Error: Assigning value to non-array");
         }
+        this.context.setIdentifierReturns("type");
         String type2 = n.f2.accept(this, argu);
         if (!type2.equals("int")) {
             throw new Exception("Semantic error: Indices must be of type int");
@@ -350,6 +351,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         if (!type1.equals("int[]") && !type1.equals("boolean[]")) {
             throw new Exception("Semantic error: Array access on non-array");
         }
+        this.context.setIdentifierReturns("type");
         String type2 = n.f2.accept(this, argu);
         if (!type2.equals("int")) {
             throw new Exception("Semantic error: Indices must be of type int");
@@ -407,9 +409,9 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         String argTypes = n.f4.present() ? n.f4.accept(this, argu) : "";
 
         // For debugging
-        System.out.println("Found method: " + methodname);
-        System.out.println("Method found has parameters: " + parameterTypes);
-        System.out.println("Method call has arguments: " + argTypes);
+        // System.out.println("Found method: " + methodname);
+        // System.out.println("Method found has parameters: " + parameterTypes);
+        // System.out.println("Method call has arguments: " + argTypes);
 
         if (!parameterTypes.equals(argTypes)) {
             // Compare each type one-by-one
@@ -593,6 +595,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         n.f2.accept(this, argu);
+        this.context.setIdentifierReturns("type");
         String type = n.f3.accept(this, argu);
         if (!type.equals("int")) {
             throw new Exception("Semantic error: Indices must be of type int");
@@ -613,6 +616,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         n.f2.accept(this, argu);
+        this.context.setIdentifierReturns("type");
         String type = n.f3.accept(this, argu);
         if (!type.equals("int")) {
             throw new Exception("Semantic error: Indices must be of type int");
