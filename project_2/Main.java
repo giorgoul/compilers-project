@@ -7,54 +7,56 @@ import syntaxtree.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        if(args.length != 1){
-            System.err.println("Usage: java Main <inputFile>");
+        if(args.length == 0){
+            System.err.println("Usage: java Main <inputFile1> <inputFile2> ...");
             System.exit(1);
         }
 
-
-
         FileInputStream fis = null;
-        try{
-            fis = new FileInputStream(args[0]);
-            MiniJavaParser parser = new MiniJavaParser(fis);
-
-            Goal root = parser.Goal();
-
-            System.err.println("Program parsed successfully.");
-
-            MyVisitor eval = new MyVisitor();
-            root.accept(eval, null);
-            eval.symbolTable.print();
-            try {
-                // Basic symbol table checks
-                SymbolTableChecks.TypeExistsCheck(eval.symbolTable);
-                SymbolTableChecks.DoubleDeclarationCheck(eval.symbolTable);
-                // Relatively weaker check, goes before the declaration one
-                SymbolTableChecks.ExtendedClassExistsCheck(eval.symbolTable);
-                SymbolTableChecks.ExtendsBeforeDeclarationCheck(eval.symbolTable);
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-            try {
-                MySecondVisitor eval2 = new MySecondVisitor(eval.symbolTable);
-                root.accept(eval2, null);
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
-        catch(ParseException ex){
-            System.out.println(ex.getMessage());
-        }
-        catch(FileNotFoundException ex){
-            System.err.println(ex.getMessage());
-        }
-        finally{
+        for (int i = 0; i < args.length; i++) {
             try{
-                if(fis != null) fis.close();
+                fis = new FileInputStream(args[i]);
+                MiniJavaParser parser = new MiniJavaParser(fis);
+
+                Goal root = parser.Goal();
+
+                MyVisitor eval = new MyVisitor();
+                root.accept(eval, null);
+                // eval.symbolTable.print();
+                try {
+                    // Basic symbol table checks
+                    SymbolTableChecks.TypeExistsCheck(eval.symbolTable);
+                    SymbolTableChecks.DoubleDeclarationCheck(eval.symbolTable);
+                    // Relatively weaker check, goes before the declaration one
+                    SymbolTableChecks.ExtendedClassExistsCheck(eval.symbolTable);
+                    SymbolTableChecks.ExtendsBeforeDeclarationCheck(eval.symbolTable);
+                } catch (Exception ex) {
+                    // System.out.println(ex.getMessage());
+                    System.out.println(args[i] + ": Fail");
+                    continue;
+                }
+                try {
+                    MySecondVisitor eval2 = new MySecondVisitor(eval.symbolTable);
+                    root.accept(eval2, null);
+                    System.out.println(args[i] + ": Success");
+                } catch (Exception ex) {
+                    // System.out.println(ex.getMessage());
+                    System.out.println(args[i] + ": Fail");
+                }
             }
-            catch(IOException ex){
+            catch(ParseException ex){
+                System.out.println(ex.getMessage());
+            }
+            catch(FileNotFoundException ex){
                 System.err.println(ex.getMessage());
+            }
+            finally{
+                try{
+                    if(fis != null) fis.close();
+                }
+                catch(IOException ex){
+                    System.err.println(ex.getMessage());
+                }
             }
         }
     }
