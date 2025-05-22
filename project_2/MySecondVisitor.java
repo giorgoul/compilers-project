@@ -452,7 +452,34 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         System.out.println("Found method: " + methodname);
         System.out.println("Method found has parameters: " + parameterTypes);
         System.out.println("Method call has arguments: " + argTypes);
-        // TODO: for each argument check whether it's a subclass of the method parameter
+
+        if (!parameterTypes.equals(argTypes)) {
+            // Compare each type one-by-one
+            String[] parameterTypesSplit = parameterTypes.split(", ");
+            String[] argTypesSplit = argTypes.split(", ");
+            if (parameterTypesSplit.length != argTypesSplit.length) {
+                throw new Exception("Semantic Error: Different number of call arguments and method parameters");
+            }
+            for (int i = 0; i < parameterTypesSplit.length; i++) {
+                // Same initial checks as with AssignmentStatements
+                if ((parameterTypesSplit[i].equals("int") && !argTypesSplit[i].equals("int")) || (!parameterTypesSplit[i].equals("int") && argTypesSplit[i].equals("int"))) {
+                    throw new Exception("Semantic error: Incompatible type during method call");
+                }
+                if ((parameterTypesSplit[i].equals("int[]") && !argTypesSplit[i].equals("int[]")) || (!parameterTypesSplit[i].equals("int[]") && argTypesSplit[i].equals("int[]"))) {
+                    throw new Exception("Semantic error: Incompatible type during method call");
+                }
+                if ((parameterTypesSplit[i].equals("boolean") && !argTypesSplit[i].equals("boolean")) || (!parameterTypesSplit[i].equals("boolean") && argTypesSplit[i].equals("boolean"))) {
+                    throw new Exception("Semantic error: Incompatible type during method call");
+                }
+                if ((parameterTypesSplit[i].equals("boolean[]") && !argTypesSplit[i].equals("boolean[]")) || (!parameterTypesSplit[i].equals("boolean[]") && argTypesSplit[i].equals("boolean[]"))) {
+                    throw new Exception("Semantic error: Incompatible type during method call");
+                }
+                if (parameterTypesSplit[i].equals(argTypesSplit[i])) continue;
+                if (!this.table.isSubclass(argTypesSplit[i], parameterTypesSplit[i])) {
+                    throw new Exception("Semantic error: Incompatible type during method call");
+                }
+            }
+        }
         return returns;
     }
 

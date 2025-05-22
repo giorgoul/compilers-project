@@ -91,6 +91,21 @@ public class MySymbolTable {
         }
     }
 
+    // Is class2 a parent of class1?
+    public boolean isSubclass(String class1, String class2) {
+        String toFind = class1;
+        while (true) {
+            for (MySymbolTableEntry entry : this.table) {
+                if (entry.getIdentifier().equals(toFind) && entry.getKind().equals("class")) {
+                    // Search ends if there isn't a parent class (same as before)
+                    if (entry.getExtend().equals("-")) return false;
+                    if (entry.getExtend().equals(class2)) return true;
+                    toFind = entry.getExtend();
+                }
+            }
+        }
+    }
+
     public int numOfOccurencies(String identifier) {
         int occurencies = 0;
         for (MySymbolTableEntry entry : this.table) {
