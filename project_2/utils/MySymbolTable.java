@@ -57,7 +57,8 @@ public class MySymbolTable {
             }
         }
         // Remove trailing ", "
-        result = result.substring(0, result.length() - 2);
+        if (!result.equals(""))
+            result = result.substring(0, result.length() - 2);
         return result;
     }
 
@@ -89,6 +90,56 @@ public class MySymbolTable {
                 }
             }
         }
+    }
+
+    // Same implementation as findMethod
+    public MySymbolTableEntry findField(String classname, String fieldname) {
+        String searchFor = classname;
+        System.out.println("Looking for field " + fieldname);
+        while (true) {
+            for (MySymbolTableEntry entry : this.table) {
+                if (entry.getIdentifier().equals(fieldname) && entry.getKind().equals("field")) {
+                    LinkedList<String> path = entry.getBelongsTo();
+                    Iterator<String> path_iterator = path.iterator();
+                    if (path_iterator.next().equals(searchFor)) {
+                        return entry;
+                    }
+                }
+            }
+            for (MySymbolTableEntry entry : this.table) {
+                if (entry.getIdentifier().equals(searchFor) && entry.getKind().equals("class")) {
+                    if (entry.getExtend().equals("-")) {
+                        return null;
+                    }
+                    searchFor = entry.getExtend();
+                    break;
+                }
+            }
+        }
+    }
+
+    public MySymbolTableEntry findVar(String classname, String methodname, String varname) {
+        for (MySymbolTableEntry entry : this.table) {
+            if (entry.getIdentifier().equals(varname) && (entry.getKind().equals("var") || entry.getKind().equals("param"))) {
+                LinkedList<String> path = entry.getBelongsTo();
+                Iterator<String> path_iterator = path.iterator();
+                if (path_iterator.next().equals(methodname)) {
+                    if (path_iterator.next().equals(classname)) {
+                        return entry;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public MySymbolTableEntry findClass(String classname) {
+        for (MySymbolTableEntry entry : this.table) {
+            if (entry.getIdentifier().equals(classname) && entry.getKind().equals("class")) {
+                return entry;
+            }
+        }
+        return null;
     }
 
     // Is class2 a parent of class1?

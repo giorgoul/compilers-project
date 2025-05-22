@@ -2,7 +2,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import syntaxtree.*;
-import utils.CompareLinkedLists;
 import utils.MySymbolTable;
 import utils.MySymbolTableEntry;
 import utils.VisitorContext;
@@ -95,38 +94,15 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     public String visit(AssignmentStatement n, Void argu) throws Exception {
         this.context.setIdentifierReturns("string");
         String identifier = n.f0.accept(this, argu);
-        // Find type of identifier (based on context)
-        // Similar code to below visitor, will refactor (TODO)
         String type1 = "";
-        for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
-            if (entry.getIdentifier().equals(identifier)) {
-                LinkedList<String> path = entry.getBelongsTo();
-                Iterator<String> path_iterator = path.iterator();
-                if (path_iterator.next().equals(this.context.getCurrentMethod())) {
-                    if (path_iterator.next().equals(this.context.getCurrentClass())) {
-                        type1 = entry.getType();
-                        break;
-                    }
-                }
-            }
+        MySymbolTableEntry varEntry = this.table.findVar(this.context.getCurrentClass(), this.context.getCurrentMethod(), identifier);
+        if (varEntry != null) {
+            type1 = varEntry.getType();
+        } else {
+            MySymbolTableEntry fieldEntry = this.table.findField(this.context.getCurrentClass(), identifier);
+            if (fieldEntry != null) type1 = fieldEntry.getType();
         }
-        if (type1.equals("")) {
-            // If not found within the method, search the whole class
-            for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
-                if (entry.getIdentifier().equals(identifier) && entry.getScope() == 1) {
-                    LinkedList<String> path = entry.getBelongsTo();
-                    Iterator<String> path_iterator = path.iterator();
-                    if (path_iterator.next().equals(this.context.getCurrentClass())) {
-                        type1 = entry.getType();
-                        break;
-                    }
-                }
-            }
-        }
-        if (type1.equals("")) {
-            throw new Exception("Semantic Error: Identifier doesn't exist");
-        }
-
+        if (type1.equals("")) throw new Exception("Semantic error: Identifier doesn't exist");
         this.context.setIdentifierReturns("type");
         String type2 = n.f2.accept(this, argu);
 
@@ -147,6 +123,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
             // Check for inheritance, is f0's type a parent of f2's type?
             // Go up the chain of inheritances until type is found (success)
             // or until there isn't another parent class (fail)
+            // TODO: change to isSubclass call
             String classToFind = type2;
             boolean done = false;
             while (!done) {
@@ -183,37 +160,18 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         this.context.setIdentifierReturns("string");
         String identifier = n.f0.accept(this, argu);
         String type1 = "";
-        for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
-            if (entry.getIdentifier().equals(identifier)) {
-                LinkedList<String> path = entry.getBelongsTo();
-                Iterator<String> path_iterator = path.iterator();
-                if (path_iterator.next().equals(this.context.getCurrentMethod())) {
-                    if (path_iterator.next().equals(this.context.getCurrentClass())) {
-                        type1 = entry.getType();
-                        break;
-                    }
-                }
-            }
+        MySymbolTableEntry varEntry = this.table.findVar(this.context.getCurrentClass(), this.context.getCurrentMethod(), identifier);
+        if (varEntry != null) {
+            type1 = varEntry.getType();
+        } else {
+            MySymbolTableEntry fieldEntry = this.table.findField(this.context.getCurrentClass(), identifier);
+            if (fieldEntry != null) type1 = fieldEntry.getType();
         }
-        if (type1.equals("")) {
-            for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
-                if (entry.getIdentifier().equals(identifier) && entry.getScope() == 1) {
-                    LinkedList<String> path = entry.getBelongsTo();
-                    Iterator<String> path_iterator = path.iterator();
-                    if (path_iterator.next().equals(this.context.getCurrentClass())) {
-                        type1 = entry.getType();
-                        break;
-                    }
-                }
-            }
-        }
-        if (type1.equals("")) {
-            throw new Exception("Semantic Error: Identifier doesn't exist");
-        }
+        if (type1.equals("")) throw new Exception("Semantic Error: Identifier doesn't exist");
+
         if (!type1.equals("int[]") && !type1.equals("boolean[]")) {
             throw new Exception("Semantic Error: Assigning value to non-array");
         }
-        this.context.setIdentifierReturns("type");
         String type2 = n.f2.accept(this, argu);
         if (!type2.equals("int")) {
             throw new Exception("Semantic error: Indices must be of type int");
@@ -446,7 +404,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         parameterTypes = this.table.getParameters(methodEntry);
 
         // Check if arguments of call match method parameters
-        String argTypes = n.f4.accept(this, argu);
+        String argTypes = n.f4.present() ? n.f4.accept(this, argu) : "";
 
         // For debugging
         System.out.println("Found method: " + methodname);
@@ -595,28 +553,12 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
             return identifier;
         } else if (this.context.getIdentifierReturns().equals("type")) {
             // Find the type based on current context
-            for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
-                // First search within the scope of the method
-                if (entry.getIdentifier().equals(identifier)) {
-                    LinkedList<String> path = entry.getBelongsTo();
-                    Iterator<String> path_iterator = path.iterator();
-                    if (path_iterator.next().equals(this.context.getCurrentMethod())) {
-                        if (path_iterator.next().equals(this.context.getCurrentClass())) {
-                            return entry.getType();
-                        }
-                    }
-                }
-            }
-            // If not found within method, search within class
-            for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
-                if (entry.getIdentifier().equals(identifier) && entry.getScope() == 1) {
-                    LinkedList<String> path = entry.getBelongsTo();
-                    Iterator<String> path_iterator = path.iterator();
-                    if (path_iterator.next().equals(this.context.getCurrentClass())) {
-                        return entry.getType();
-                    }
-                }
-            }
+            MySymbolTableEntry varEntry = this.table.findVar(this.context.getCurrentClass(), this.context.getCurrentMethod(), identifier);
+            if (varEntry != null) return varEntry.getType();
+            MySymbolTableEntry fieldEntry = this.table.findField(this.context.getCurrentClass(), identifier);
+            if (fieldEntry != null) return fieldEntry.getType();
+            MySymbolTableEntry methodEntry = this.table.findMethod(this.context.getCurrentClass(), identifier);
+            if (methodEntry != null) return methodEntry.getType();
             throw new Exception("Semantic Error: Identifier doesn't exist");
         }
         return null;
@@ -690,12 +632,9 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         // Search class that matches f1
         this.context.setIdentifierReturns("string");
         String identifier = n.f1.accept(this, argu);
+        MySymbolTableEntry classEntry = this.table.findClass(identifier);
+        if (classEntry != null) return identifier;
         // If class doesn't exist, throw exception
-        for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
-            if (entry.getIdentifier().equals(identifier) && (entry.getKind().equals("class") || entry.getKind().equals("mainclass"))) {
-                return entry.getIdentifier();
-            }
-        }
         throw new Exception("Semantic error: Class " + identifier + " doesn't exist");
     }
 
