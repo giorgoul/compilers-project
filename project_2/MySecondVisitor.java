@@ -437,33 +437,22 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         // Check whether method exists within class type (or any of type's parent classes)
         String methodname = n.f2.accept(this, argu);
         String returns = "";
-        LinkedList<String> parameters = new LinkedList<String>();
+        String parameterTypes = "";
         MySymbolTableEntry methodEntry = this.table.findMethod(type, methodname);
         if (methodEntry == null) {
             throw new Exception("Semantic Error: Method doesn't exist within class or its parents");
         }
         returns = methodEntry.getType();
-        parameters = this.table.getParameters(methodEntry);
+        parameterTypes = this.table.getParameters(methodEntry);
 
         // Check if arguments of call match method parameters
-        n.f4.accept(this, argu);
-        // TODO: Change the way arguments are stored
+        String argTypes = n.f4.accept(this, argu);
+
         // For debugging
         System.out.println("Found method: " + methodname);
-        System.out.println("Method found has parameters: ");
-        for (String parameter : parameters) {
-            System.out.println(parameter);
-        }
-        System.out.println("Method call has arguments: ");
-        for (String argument : this.context.getTempLinkedList()) {
-            System.out.println(argument);
-        }
+        System.out.println("Method found has parameters: " + parameterTypes);
+        System.out.println("Method call has arguments: " + argTypes);
         // TODO: for each argument check whether it's a subclass of the method parameter
-        if (!CompareLinkedLists.compare(parameters, this.context.getTempLinkedList())) {
-            throw new Exception("Semantic error: Method call arguments and method declaration parameters mismatch");
-        }
-        // Reset tempLinkedList for future use
-        this.context.resetTempLinkedList();
         return returns;
     }
 
@@ -471,14 +460,15 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         * f0 -> Expression()
         * f1 -> ExpressionTail()
     */
+    // Return ExpressionLists as comma-separated types, same as with FormalParameters.
     @Override
     public String visit(ExpressionList n, Void argu) throws Exception {
         this.context.setIdentifierReturns("type");
-        String type = n.f0.accept(this, argu);
-        this.context.getTempLinkedList().add(type);
-        
-        n.f1.accept(this, argu);
-        return null;
+        String types = n.f0.accept(this, argu);
+        if (n.f1 != null) {
+            types += n.f1.accept(this, argu);
+        }
+        return types;
     }
 
     /**
@@ -486,7 +476,11 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(ExpressionTail n, Void argu) throws Exception {
-        return n.f0.accept(this, argu);
+        String types = "";
+        for (Node node : n.f0.nodes) {
+            types += ", " + node.accept(this, null);
+        }
+        return types;
     }
 
     /**
@@ -496,10 +490,8 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     @Override
     public String visit(ExpressionTerm n, Void argu) throws Exception {
         this.context.setIdentifierReturns("type");
-        n.f0.accept(this, argu);
         String type = n.f1.accept(this, argu);
-        this.context.getTempLinkedList().add(type);
-        return null;
+        return type;
     }
 
     /**

@@ -34,9 +34,9 @@ public class MySymbolTable {
         return this.context;
     }
 
-    // Returns a linked list of a method's parameter types, with the method (table entry) as input
-    public LinkedList<String> getParameters(MySymbolTableEntry method) {
-        LinkedList<String> result = new LinkedList<String>();
+    // Returns a comma-separated string of a method's parameter types
+    public String getParameters(MySymbolTableEntry method) {
+        String result = "";
         boolean found = false;
         for (MySymbolTableEntry entry : this.table) {
             // Unnecessary checks, just want to make sure
@@ -50,12 +50,14 @@ public class MySymbolTable {
                 // Method parameters are stored right after the method itself, so we keep
                 // adding them until we run into another method or class
                 if (entry.getKind().equals("param")) {
-                    result.add(entry.getType());
+                    result += entry.getType() + ", ";
                 } else {
                     break;
                 }
             }
         }
+        // Remove trailing ", "
+        result = result.substring(0, result.length() - 2);
         return result;
     }
 
