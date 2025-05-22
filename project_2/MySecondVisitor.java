@@ -433,28 +433,21 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
             throw new Exception("Semantic Error: Primitive types don't have methods");
         }
         this.context.setIdentifierReturns("string");
-        // Check whether method exists within class type
+
+        // Check whether method exists within class type (or any of type's parent classes)
         String methodname = n.f2.accept(this, argu);
-        boolean exists = false;
         String returns = "";
         LinkedList<String> parameters = new LinkedList<String>();
-        for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
-            if (entry.getIdentifier().equals(methodname) && entry.getKind().equals("method")) {
-                LinkedList<String> path = entry.getBelongsTo();
-                Iterator<String> path_iterator = path.iterator();
-                // Make sure that the first (and only) element of the path is equal to the class name
-                if (path_iterator.next().equals(type)) {
-                    exists = true;
-                    returns = entry.getType();
-                    parameters = this.table.getParameters(entry);
-                }
-            }
+        MySymbolTableEntry methodEntry = this.table.findMethod(type, methodname);
+        if (methodEntry == null) {
+            throw new Exception("Semantic Error: Method doesn't exist within class or its parents");
         }
-        if (!exists) {
-            throw new Exception("Semantic Error: Method doesn't exist within class");
-        }
+        returns = methodEntry.getType();
+        parameters = this.table.getParameters(methodEntry);
+
         // Check if arguments of call match method parameters
         n.f4.accept(this, argu);
+        // TODO: Change the way arguments are stored
         // For debugging
         System.out.println("Found method: " + methodname);
         System.out.println("Method found has parameters: ");

@@ -1,4 +1,5 @@
 package utils;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
@@ -56,6 +57,36 @@ public class MySymbolTable {
             }
         }
         return result;
+    }
+
+    // Returns the method table entry if it exists within classname
+    // Searches within the parent class(es) as well
+    public MySymbolTableEntry findMethod(String classname, String methodname) {
+        String searchFor = classname;
+        while (true) {
+            for (MySymbolTableEntry entry : this.table) {
+                if (entry.getIdentifier().equals(methodname) && entry.getKind().equals("method")) {
+                    LinkedList<String> path = entry.getBelongsTo();
+                    Iterator<String> path_iterator = path.iterator();
+                    // Make sure that the first (and only) element of the path is equal to the class name
+                    if (path_iterator.next().equals(searchFor)) {
+                        return entry;
+                    }
+                }
+            }
+            // If the method is not found within the current class, look for it on its parent
+            for (MySymbolTableEntry entry : this.table) {
+                if (entry.getIdentifier().equals(searchFor) && entry.getKind().equals("class")) {
+                    // Search ends if there isn't a parent class
+                    if (entry.getExtend().equals("-")) {
+                        return null;
+                    }
+                    // Change searchFor and go back to the method search
+                    searchFor = entry.getExtend();
+                    break;
+                }
+            }
+        }
     }
 
     public int numOfOccurencies(String identifier) {
