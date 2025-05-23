@@ -1,6 +1,3 @@
-import java.util.LinkedList;
-import java.util.Optional;
-
 import syntaxtree.*;
 import utils.MySymbolTable;
 import visitor.*;
@@ -33,8 +30,10 @@ class MyVisitor extends GJDepthFirst<String, Void>{
     @Override
     public String visit(MainClass n, Void argu) throws Exception {
         String classname = n.f1.accept(this, null);
+        String argsname = n.f11.accept(this, null);
 
         this.symbolTable.insert(classname, "mainclass", "-", "-");
+        this.symbolTable.insert(argsname, "param", "-", "String[]");
         // We're within a method, i.e. scope 2
         // Current path is main -> classname
         this.symbolTable.getContext().addToPath(classname);

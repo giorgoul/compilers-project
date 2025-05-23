@@ -22,7 +22,6 @@ public class Main {
 
                 MyVisitor eval = new MyVisitor();
                 root.accept(eval, null);
-                // eval.symbolTable.print();
                 try {
                     // Basic symbol table checks
                     SymbolTableChecks.TypeExistsCheck(eval.symbolTable);
