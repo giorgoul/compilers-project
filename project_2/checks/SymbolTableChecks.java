@@ -1,4 +1,5 @@
 package checks;
+import java.util.Vector;
 import utils.MySymbolTable;
 import utils.MySymbolTableEntry;
 import utils.CompareLinkedLists;
@@ -72,7 +73,7 @@ public class SymbolTableChecks {
 
     public static void TypeExistsCheck(MySymbolTable table) throws Exception {
         for (MySymbolTableEntry entry : table.getSymbolTable()) {
-            if (entry.getKind().equals("var") || entry.getKind().equals("field") || entry.getKind().equals("param"))
+            if (entry.getKind().equals("var") || entry.getKind().equals("field") || entry.getKind().equals("param")) {
                 // int, int[], boolean, boolean[] always exist
                 if (entry.getType().equals("int") || entry.getType().equals("int[]") || entry.getType().equals("boolean") || entry.getType().equals("boolean[]")) {
                     continue;
@@ -86,6 +87,30 @@ public class SymbolTableChecks {
                     if (!found)
                         throw new Exception("Semantic Error: Type " + entry.getType() + " doesn't exist");
                 }
+            }
+        }
+    }
+
+    public static void ProperOverrideCheck(MySymbolTable table) throws Exception {
+        // For each extended class' method, search its parent and compare the return
+        // type and parameters
+        for (MySymbolTableEntry entry : table.getSymbolTable()) {
+            if (entry.getKind().equals("class") && !entry.getExtend().equals("-")) {
+                Vector<MySymbolTableEntry> methods = table.getMethods(entry.getIdentifier());
+                // Search for method in parent class and then compare return type, parameters
+                for (MySymbolTableEntry method : methods) {
+                    MySymbolTableEntry parentMethod = table.findMethod(entry.getExtend(), method.getIdentifier());
+                    if (parentMethod == null) continue;
+                    if (!parentMethod.getType().equals(method.getType())) {
+                        throw new Exception("Semantic error: Improper overriding");
+                    }
+                    String parentParameters = table.getParameters(parentMethod);
+                    String parameters = table.getParameters(method);
+                    if (!parentParameters.equals(parameters)) {
+                        throw new Exception("Semantic error: Improper overriding");
+                    }
+                }
+            }
         }
     }
 }
