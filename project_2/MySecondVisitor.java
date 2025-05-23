@@ -120,26 +120,8 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
             if ((type1.equals("boolean[]") && !type2.equals("boolean[]")) || (!type1.equals("boolean[]") && type2.equals("boolean[]"))) {
                 throw new Exception("Semantic error: Incompatible type when assigning to variable");
             }
-            // Check for inheritance, is f0's type a parent of f2's type?
-            // Go up the chain of inheritances until type is found (success)
-            // or until there isn't another parent class (fail)
-            // TODO: change to isSubclass call
-            String classToFind = type2;
-            boolean done = false;
-            while (!done) {
-                for (MySymbolTableEntry entry : this.table.getSymbolTable()) {
-                    if (entry.getKind().equals("class") && entry.getIdentifier().equals(classToFind)) {
-                        if (entry.getExtend().equals("-")) {
-                            throw new Exception("Semantic error: Incompatible type when assigning to variable");
-                        }
-                        if (entry.getExtend().equals(type1)) {
-                            done = true;
-                            break;
-                        }
-                        classToFind = entry.getExtend();
-                        break;
-                    }
-                }
+            if (!this.table.isSubclass(type2, type1)) {
+                throw new Exception("Semantic error: Incompatible type when assigning to variable");
             }
         }
         n.f3.accept(this, argu);

@@ -27,11 +27,9 @@ public class Main {
                     SymbolTableChecks.TypeExistsCheck(eval.symbolTable);
                     SymbolTableChecks.DoubleDeclarationCheck(eval.symbolTable);
                     SymbolTableChecks.ProperOverrideCheck(eval.symbolTable);
-                    // Relatively weaker check, goes before the declaration one
                     SymbolTableChecks.ExtendedClassExistsCheck(eval.symbolTable);
                     SymbolTableChecks.ExtendsBeforeDeclarationCheck(eval.symbolTable);
                 } catch (Exception ex) {
-                    // System.out.println(ex.getMessage());
                     System.out.println(args[i] + ": Fail");
                     continue;
                 }
@@ -40,7 +38,6 @@ public class Main {
                     root.accept(eval2, null);
                     System.out.println(args[i] + ": Success");
                 } catch (Exception ex) {
-                    // System.out.println(ex.getMessage());
                     System.out.println(args[i] + ": Fail");
                 }
             }
