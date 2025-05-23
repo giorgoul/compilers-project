@@ -1,4 +1,6 @@
 package checks;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Vector;
 import utils.MySymbolTable;
 import utils.MySymbolTableEntry;
@@ -72,23 +74,29 @@ public class SymbolTableChecks {
     }
 
     public static void TypeExistsCheck(MySymbolTable table) throws Exception {
+        boolean found = false;
         for (MySymbolTableEntry entry : table.getSymbolTable()) {
+            // Special case for main
+            if (entry.getType().equals("String[]") && entry.getKind().equals("param")) {
+                LinkedList<String> path = entry.getBelongsTo();
+                Iterator<String> pathIterator = path.iterator();
+                if (pathIterator.next().equals("main")) found = true;
+            }
             if (entry.getKind().equals("var") || entry.getKind().equals("field") || entry.getKind().equals("param")) {
                 // int, int[], boolean, boolean[] always exist
                 if (entry.getType().equals("int") || entry.getType().equals("int[]") || entry.getType().equals("boolean") || entry.getType().equals("boolean[]")) {
                     continue;
                 } else {
-                    boolean found = false;
                     for (MySymbolTableEntry entry2 : table.getSymbolTable()) {
                         if (entry2.getKind().equals("class"))
                             if (entry2.getIdentifier().equals(entry.getType()))
                                 found = true;
                     }
-                    if (!found)
-                        throw new Exception("Semantic Error: Type " + entry.getType() + " doesn't exist");
                 }
             }
         }
+        if (!found)
+            throw new Exception("Semantic Error: Type doesn't exist");
     }
 
     public static void ProperOverrideCheck(MySymbolTable table) throws Exception {

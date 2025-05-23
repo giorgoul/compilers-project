@@ -33,13 +33,13 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         String argsname = n.f11.accept(this, null);
 
         this.symbolTable.insert(classname, "mainclass", "-", "-");
-        this.symbolTable.insert(argsname, "param", "-", "String[]");
         // We're within a method, i.e. scope 2
         // Current path is main -> classname
         this.symbolTable.getContext().addToPath(classname);
         this.symbolTable.getContext().addToPath("main");
         this.symbolTable.getContext().incrementScope();
         this.symbolTable.getContext().incrementScope();
+        this.symbolTable.insert(argsname, "param", "-", "String[]");
         n.f14.accept(this, argu);
         // Revert path done so far and scope
         this.symbolTable.getContext().decrementScope();
