@@ -27,6 +27,7 @@ public class Main {
                     // Basic symbol table checks
                     SymbolTableChecks.TypeExistsCheck(eval.symbolTable);
                     SymbolTableChecks.DoubleDeclarationCheck(eval.symbolTable);
+                    SymbolTableChecks.ProperOverrideCheck(eval.symbolTable);
                     // Relatively weaker check, goes before the declaration one
                     SymbolTableChecks.ExtendedClassExistsCheck(eval.symbolTable);
                     SymbolTableChecks.ExtendsBeforeDeclarationCheck(eval.symbolTable);

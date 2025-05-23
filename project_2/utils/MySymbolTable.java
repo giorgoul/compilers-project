@@ -95,7 +95,6 @@ public class MySymbolTable {
     // Same implementation as findMethod
     public MySymbolTableEntry findField(String classname, String fieldname) {
         String searchFor = classname;
-        System.out.println("Looking for field " + fieldname);
         while (true) {
             for (MySymbolTableEntry entry : this.table) {
                 if (entry.getIdentifier().equals(fieldname) && entry.getKind().equals("field")) {
@@ -155,6 +154,25 @@ public class MySymbolTable {
                 }
             }
         }
+    }
+
+    public Vector<MySymbolTableEntry> getMethods(String class1) {
+        Vector<MySymbolTableEntry> methods = new Vector<MySymbolTableEntry>();
+        boolean found = false;
+        for (MySymbolTableEntry entry : this.table) {
+            if (!found) {
+                if (entry.getIdentifier().equals(class1) && entry.getKind().equals("class")) {
+                    found = true;
+                }
+            } else {
+                if (entry.getKind().equals("method")) {
+                    methods.add(entry);
+                } else if (entry.getKind().equals("class")) {
+                    break;
+                }
+            }
+        }
+        return methods;
     }
 
     public int numOfOccurencies(String identifier) {
