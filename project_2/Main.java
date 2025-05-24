@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import checks.SymbolTableChecks;
 import syntaxtree.*;
+import utils.PrintOffsets;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -40,6 +41,7 @@ public class Main {
                 } catch (Exception ex) {
                     System.out.println(args[i] + ": Fail");
                 }
+                PrintOffsets.print(eval.symbolTable);
             }
             catch(ParseException ex){
                 System.out.println(ex.getMessage());
