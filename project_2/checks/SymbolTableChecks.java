@@ -13,7 +13,7 @@ public class SymbolTableChecks {
             MySymbolTableEntry entry = table.getSymbolTable().elementAt(i);
             for (int j = 0; j < table.getSymbolTable().size(); j++) {
                 MySymbolTableEntry entry2 = table.getSymbolTable().elementAt(j);
-                if (i != j && entry.getIdentifier().equals(entry2.getIdentifier()) && CompareLinkedLists.compare(entry.getBelongsTo(), entry2.getBelongsTo()))
+                if (i != j && entry.getIdentifier().equals(entry2.getIdentifier()) && CompareLinkedLists.compare(entry.getBelongsTo(), entry2.getBelongsTo()) && entry.getScope() == entry2.getScope())
                     throw new Exception("Semantic error: Identifier declared more than once");
             }
         }
