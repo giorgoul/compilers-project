@@ -143,6 +143,8 @@ public class MySymbolTable {
 
     // Is class2 a parent of class1?
     public boolean isSubclass(String class1, String class2) {
+        if (class1.equals("int") || class1.equals("int[]") || class1.equals("boolean") || class1.equals("boolean[]")) return false;
+        if (class2.equals("int") || class2.equals("int[]") || class2.equals("boolean") || class2.equals("boolean[]")) return false;
         String toFind = class1;
         while (true) {
             for (MySymbolTableEntry entry : this.table) {

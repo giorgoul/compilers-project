@@ -724,9 +724,10 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         n.f8.accept(this, null);
         this.context.setIdentifierReturns("type");
         String type = n.f10.accept(this, null);
-        // TODO: Check whether type is a subclass of returns 
         if (!type.equals(returns)) {
-            throw new Exception("Semantic Error: Method type and return expression mismatch");
+            if (!this.table.isSubclass(returns, type)) {
+                throw new Exception("Semantic Error: Method type and return expression mismatch");
+            }
         }
         this.context.decrementScope();
         this.context.setCurrentMethod("");
