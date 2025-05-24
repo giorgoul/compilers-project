@@ -79,7 +79,7 @@ public class MySymbolTable {
             }
             // If the method is not found within the current class, look for it on its parent
             for (MySymbolTableEntry entry : this.table) {
-                if (entry.getIdentifier().equals(searchFor) && entry.getKind().equals("class")) {
+                if (entry.getIdentifier().equals(searchFor) && (entry.getKind().equals("class") || entry.getKind().equals("mainclass"))) {
                     // Search ends if there isn't a parent class
                     if (entry.getExtend().equals("-")) {
                         return null;
