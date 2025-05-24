@@ -156,8 +156,8 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         String myName = n.f2.accept(this, null);
 
         this.symbolTable.getContext().incrementScope();
-        this.symbolTable.getContext().addToPath(myName);
         this.symbolTable.insert(myName, "method", "-", myType);
+        this.symbolTable.getContext().addToPath(myName);
 
         if (n.f4.present()) {
             n.f4.accept(this, null);
