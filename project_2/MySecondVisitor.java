@@ -12,7 +12,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     MySymbolTable table;
 
     // Context so that inner visitors (e.g. AssignmentStatement) "know"
-    // where they are. Similar to MySymbolTable.
+    // where they are. Similar to MySymbolTable's context.
 
     VisitorContext context;
     
@@ -48,9 +48,11 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         context.setCurrentMethod("main");
         context.incrementScope();
         context.incrementScope();
+
         context.setIdentifierReturns("type");
         n.f15.accept(this, argu);
         context.setIdentifierReturns("string");
+
         context.decrementScope();
         context.decrementScope();
         context.setCurrentMethod("");
@@ -78,9 +80,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(Block n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
         n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
         return null;
     }
 
@@ -92,6 +92,8 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(AssignmentStatement n, Void argu) throws Exception {
+        // Not using setIdentifierReturns("type") in here because
+        // we're looking only for variables and class fields, not class / method names
         this.context.setIdentifierReturns("string");
         String identifier = n.f0.accept(this, argu);
         String type1 = "";
@@ -120,11 +122,11 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
             if ((type1.equals("boolean[]") && !type2.equals("boolean[]")) || (!type1.equals("boolean[]") && type2.equals("boolean[]"))) {
                 throw new Exception("Semantic error: Incompatible type when assigning to variable");
             }
+            // f2's type must be a subtype of f0's type
             if (!this.table.isSubclass(type2, type1)) {
                 throw new Exception("Semantic error: Incompatible type when assigning to variable");
             }
         }
-        n.f3.accept(this, argu);
         return null;
     }
 
@@ -177,7 +179,6 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(IfStatement n, Void argu) throws Exception {
-
         this.context.setIdentifierReturns("type");
         String type = n.f2.accept(this, argu);
         if (!type.equals("boolean")) {
@@ -234,7 +235,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         *       | MessageSend()
         *       | Clause()
     */
-    // Returns the resulting type of the expression
+    // Return the resulting type of the expression
     public String visit(Expression n, Void argu) throws Exception {
         return n.f0.accept(this, null);
     }
@@ -285,6 +286,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         if (!type1.equals("int") || !type2.equals("int")) {
             throw new Exception("Semantic error: Can only add ints");
         }
+        // Result of +, -, * expressions is int
         return "int";
     }
 
@@ -341,6 +343,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         if (type1.equals("int[]")) {
             return "int";
         }
+        // No need to check for type2, will be found by grammar
         return "boolean";
     }
 
@@ -390,11 +393,6 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         // Check if arguments of call match method parameters
         String argTypes = n.f4.present() ? n.f4.accept(this, argu) : "";
 
-        // For debugging
-        // System.out.println("Found method: " + methodname);
-        // System.out.println("Method found has parameters: " + parameterTypes);
-        // System.out.println("Method call has arguments: " + argTypes);
-
         if (!parameterTypes.equals(argTypes)) {
             // Compare each type one-by-one
             String[] parameterTypesSplit = parameterTypes.split(", ");
@@ -417,6 +415,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
                     throw new Exception("Semantic error: Incompatible type during method call");
                 }
                 if (parameterTypesSplit[i].equals(argTypesSplit[i])) continue;
+                // Check whether argument is a subtype of parameter
                 if (!this.table.isSubclass(argTypesSplit[i], parameterTypesSplit[i])) {
                     throw new Exception("Semantic error: Incompatible type during method call");
                 }
@@ -429,7 +428,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         * f0 -> Expression()
         * f1 -> ExpressionTail()
     */
-    // Return ExpressionLists as comma-separated types, same as with FormalParameters.
+    // Return ExpressionLists as a comma-separated string of types, same as with FormalParameters.
     @Override
     public String visit(ExpressionList n, Void argu) throws Exception {
         this.context.setIdentifierReturns("type");
@@ -483,6 +482,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         if (!type.equals("boolean")) {
             throw new Exception("Semantic error: Clause doesn't evaluate to boolean type");
         }
+        // Could also return "boolean" directly
         return type;
     }
 
@@ -505,6 +505,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     /**
         * f0 -> <INTEGER_LITERAL>
     */
+    // "Base cases"
     @Override
     public String visit(IntegerLiteral n, Void argu) throws Exception {
         return "int";
@@ -574,9 +575,6 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(BooleanArrayAllocationExpression n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
         this.context.setIdentifierReturns("type");
         String type = n.f3.accept(this, argu);
         if (!type.equals("int")) {
@@ -595,9 +593,6 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(IntegerArrayAllocationExpression n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-        n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
         this.context.setIdentifierReturns("type");
         String type = n.f3.accept(this, argu);
         if (!type.equals("int")) {
@@ -631,9 +626,7 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     */
     @Override
     public String visit(BracketExpression n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
         String type = n.f1.accept(this, argu);
-        n.f2.accept(this, argu);
         return type;
     }
 
@@ -648,9 +641,10 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     @Override
     public String visit(ClassDeclaration n, Void argu) throws Exception {
         this.context.setIdentifierReturns("string");
-        String classname = n.f1.accept(this, argu);
+        String className = n.f1.accept(this, argu);
         this.context.incrementScope();
-        this.context.setCurrentClass(classname);
+        this.context.setCurrentClass(className);
+        // scope and currentMethod are icremented / decremented within MethodDeclaration visitor
         n.f4.accept(this, argu);
         this.context.setCurrentClass("");
         this.context.decrementScope();
@@ -671,28 +665,13 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     @Override
     public String visit(ClassExtendsDeclaration n, Void argu) throws Exception {
         this.context.setIdentifierReturns("string");
-        String classname = n.f1.accept(this, null);
+        String className = n.f1.accept(this, null);
         this.context.incrementScope();
-        this.context.setCurrentClass(classname);
+        this.context.setCurrentClass(className);
         n.f6.accept(this, argu);
         this.context.setCurrentClass("");
         this.context.decrementScope();
         return null;
-    }
-
-    /**
-    * f0 -> Type()
-    * f1 -> Identifier()
-    * f2 -> ";"
-    */
-   public String visit(VarDeclaration n, Void argu) throws Exception {
-        String _ret=null;
-        String type = n.f0.accept(this, argu);
-        // For consistency
-        this.context.setIdentifierReturns("string");
-        String var = n.f1.accept(this, argu);
-        
-        return _ret;
     }
 
     /**
@@ -714,14 +693,13 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
     public String visit(MethodDeclaration n, Void argu) throws Exception {
         this.context.setIdentifierReturns("string");
         String returns = n.f1.accept(this, null);
-        String methodname = n.f2.accept(this, null);
+        String methodName = n.f2.accept(this, null);
         this.context.incrementScope();
-        this.context.setCurrentMethod(methodname);
+        this.context.setCurrentMethod(methodName);
 
         n.f4.accept(this, null);
-
-        n.f7.accept(this, null);
         n.f8.accept(this, null);
+        
         this.context.setIdentifierReturns("type");
         String type = n.f10.accept(this, null);
         if (!type.equals(returns)) {

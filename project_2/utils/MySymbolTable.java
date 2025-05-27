@@ -9,6 +9,8 @@ import java.util.Vector;
  * A | "class" | "-" | "-" | 0 (always since classes cannot exist within other classes) | empty linked list
  * x | "field"   | "-" | "int" | 1 (within A)      | "A"
  * y | "field"   | "-" | "int" | 1                 | "A"
+ * Using an array even though searches are slow because it's simple to use and most programs aren't going
+ * to be that big anyway.
  */
 
 public class MySymbolTable {
@@ -64,11 +66,11 @@ public class MySymbolTable {
 
     // Returns the method table entry if it exists within classname
     // Searches within the parent class(es) as well
-    public MySymbolTableEntry findMethod(String classname, String methodname) {
-        String searchFor = classname;
+    public MySymbolTableEntry findMethod(String className, String methodName) {
+        String searchFor = className;
         while (true) {
             for (MySymbolTableEntry entry : this.table) {
-                if (entry.getIdentifier().equals(methodname) && entry.getKind().equals("method")) {
+                if (entry.getIdentifier().equals(methodName) && entry.getKind().equals("method")) {
                     LinkedList<String> path = entry.getBelongsTo();
                     Iterator<String> path_iterator = path.iterator();
                     // Make sure that the first (and only) element of the path is equal to the class name
@@ -93,11 +95,11 @@ public class MySymbolTable {
     }
 
     // Same implementation as findMethod
-    public MySymbolTableEntry findField(String classname, String fieldname) {
-        String searchFor = classname;
+    public MySymbolTableEntry findField(String className, String fieldName) {
+        String searchFor = className;
         while (true) {
             for (MySymbolTableEntry entry : this.table) {
-                if (entry.getIdentifier().equals(fieldname) && entry.getKind().equals("field")) {
+                if (entry.getIdentifier().equals(fieldName) && entry.getKind().equals("field")) {
                     LinkedList<String> path = entry.getBelongsTo();
                     Iterator<String> path_iterator = path.iterator();
                     if (path_iterator.next().equals(searchFor)) {
@@ -117,13 +119,13 @@ public class MySymbolTable {
         }
     }
 
-    public MySymbolTableEntry findVar(String classname, String methodname, String varname) {
+    public MySymbolTableEntry findVar(String className, String methodName, String varName) {
         for (MySymbolTableEntry entry : this.table) {
-            if (entry.getIdentifier().equals(varname) && (entry.getKind().equals("var") || entry.getKind().equals("param"))) {
+            if (entry.getIdentifier().equals(varName) && (entry.getKind().equals("var") || entry.getKind().equals("param"))) {
                 LinkedList<String> path = entry.getBelongsTo();
                 Iterator<String> path_iterator = path.iterator();
-                if (path_iterator.next().equals(methodname)) {
-                    if (path_iterator.next().equals(classname)) {
+                if (path_iterator.next().equals(methodName)) {
+                    if (path_iterator.next().equals(className)) {
                         return entry;
                     }
                 }
@@ -132,9 +134,9 @@ public class MySymbolTable {
         return null;
     }
 
-    public MySymbolTableEntry findClass(String classname) {
+    public MySymbolTableEntry findClass(String className) {
         for (MySymbolTableEntry entry : this.table) {
-            if (entry.getIdentifier().equals(classname) && entry.getKind().equals("class")) {
+            if (entry.getIdentifier().equals(className) && entry.getKind().equals("class")) {
                 return entry;
             }
         }
@@ -175,27 +177,6 @@ public class MySymbolTable {
             }
         }
         return methods;
-    }
-
-    public int numOfOccurencies(String identifier) {
-        int occurencies = 0;
-        for (MySymbolTableEntry entry : this.table) {
-            if (identifier.equals(entry.identifier)) {
-                occurencies++;
-            }
-        }
-        
-        return occurencies;
-    }
-
-    public MySymbolTableEntry find(String identifier, String kind, String type, int scope, int occurrence) {
-        int temp = 0;
-        for (MySymbolTableEntry entry : this.table) {
-            if (++temp == occurrence) {
-                return entry;
-            }
-        }
-        return new MySymbolTableEntry("not found", "-", "-", "-", -1, new LinkedList<>());
     }
 
     // For debugging purposes

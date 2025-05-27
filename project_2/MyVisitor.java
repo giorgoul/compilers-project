@@ -6,7 +6,6 @@ import visitor.*;
 class MyVisitor extends GJDepthFirst<String, Void>{
     MySymbolTable symbolTable = new MySymbolTable();
 
-
     /**
      * f0 -> "class"
      * f1 -> Identifier()
@@ -29,17 +28,19 @@ class MyVisitor extends GJDepthFirst<String, Void>{
      */
     @Override
     public String visit(MainClass n, Void argu) throws Exception {
-        String classname = n.f1.accept(this, null);
-        String argsname = n.f11.accept(this, null);
+        String className = n.f1.accept(this, null);
+        String argsName = n.f11.accept(this, null);
 
-        this.symbolTable.insert(classname, "mainclass", "-", "-");
+        this.symbolTable.insert(className, "mainclass", "-", "-");
         // We're within a method, i.e. scope 2
-        // Current path is main -> classname
-        this.symbolTable.getContext().addToPath(classname);
+        // Current path is main -> className
+        this.symbolTable.getContext().addToPath(className);
         this.symbolTable.getContext().addToPath("main");
         this.symbolTable.getContext().incrementScope();
         this.symbolTable.getContext().incrementScope();
-        this.symbolTable.insert(argsname, "param", "-", "String[]");
+
+        this.symbolTable.insert(argsName, "param", "-", "String[]");
+
         n.f14.accept(this, argu);
         // Revert path done so far and scope
         this.symbolTable.getContext().decrementScope();
@@ -59,22 +60,16 @@ class MyVisitor extends GJDepthFirst<String, Void>{
      */
     @Override
     public String visit(ClassDeclaration n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-        
-        String classname = n.f1.accept(this, argu);
-        this.symbolTable.insert(classname, "class", "-", "-");
-
-        n.f2.accept(this, argu);
+        String className = n.f1.accept(this, argu);
+        this.symbolTable.insert(className, "class", "-", "-");
 
         this.symbolTable.getContext().incrementScope();
-        this.symbolTable.getContext().addToPath(classname);
+        this.symbolTable.getContext().addToPath(className);
         n.f3.accept(this, argu);
         n.f4.accept(this, argu);
 
         this.symbolTable.getContext().removeLastFromPath();
         this.symbolTable.getContext().decrementScope();
-
-        n.f5.accept(this, argu);
 
         return null;
     }
@@ -91,27 +86,19 @@ class MyVisitor extends GJDepthFirst<String, Void>{
      */
     @Override
     public String visit(ClassExtendsDeclaration n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
+        String className = n.f1.accept(this, null);
+        String extendName = n.f3.accept(this, argu);
 
-        String classname = n.f1.accept(this, null);
-
-        n.f2.accept(this, argu);
-        String extendsname = n.f3.accept(this, argu);
-
-        this.symbolTable.insert(classname, "class", extendsname, "-");
-
-        n.f4.accept(this, argu);
+        this.symbolTable.insert(className, "class", extendName, "-");
 
         this.symbolTable.getContext().incrementScope();
-        this.symbolTable.getContext().addToPath(classname);
+        this.symbolTable.getContext().addToPath(className);
         n.f5.accept(this, argu);
 
         n.f6.accept(this, argu);
 
         this.symbolTable.getContext().removeLastFromPath();
         this.symbolTable.getContext().decrementScope();
-        
-        n.f7.accept(this, argu);
 
         return null;
     }
@@ -122,7 +109,7 @@ class MyVisitor extends GJDepthFirst<String, Void>{
     * f2 -> ";"
     */
    public String visit(VarDeclaration n, Void argu) throws Exception {
-        String _ret=null;
+        String _ret = null;
         String type = n.f0.accept(this, argu);
         String var = n.f1.accept(this, argu);
         // Class field
@@ -152,12 +139,12 @@ class MyVisitor extends GJDepthFirst<String, Void>{
      */
     @Override
     public String visit(MethodDeclaration n, Void argu) throws Exception {
-        String myType = n.f1.accept(this, null);
-        String myName = n.f2.accept(this, null);
+        String methodType = n.f1.accept(this, null);
+        String methodName = n.f2.accept(this, null);
 
         this.symbolTable.getContext().incrementScope();
-        this.symbolTable.insert(myName, "method", "-", myType);
-        this.symbolTable.getContext().addToPath(myName);
+        this.symbolTable.insert(methodName, "method", "-", methodType);
+        this.symbolTable.getContext().addToPath(methodName);
 
         if (n.f4.present()) {
             n.f4.accept(this, null);
