@@ -2,9 +2,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import checks.SymbolTableChecks;
 import syntaxtree.*;
 import utils.PrintOffsets;
+import utils.SymbolTableChecks;
 
 public class Main {
     public static void main(String[] args) throws Exception {
