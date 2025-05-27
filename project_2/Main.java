@@ -38,10 +38,10 @@ public class Main {
                     MySecondVisitor eval2 = new MySecondVisitor(eval.symbolTable);
                     root.accept(eval2, null);
                     System.out.println(args[i] + ": Success");
+                    PrintOffsets.print(eval.symbolTable);
                 } catch (Exception ex) {
                     System.out.println(args[i] + ": Fail");
                 }
-                PrintOffsets.print(eval.symbolTable);
             }
             catch(ParseException ex){
                 System.out.println(ex.getMessage());
