@@ -1,10 +1,7 @@
-package checks;
+package utils;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
-import utils.MySymbolTable;
-import utils.MySymbolTableEntry;
-import utils.CompareLinkedLists;
 
 public class SymbolTableChecks {
     public static void DoubleDeclarationCheck(MySymbolTable table) throws Exception {
