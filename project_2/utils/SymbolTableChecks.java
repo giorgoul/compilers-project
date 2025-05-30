@@ -79,7 +79,7 @@ public class SymbolTableChecks {
                 Iterator<String> pathIterator = path.iterator();
                 if (pathIterator.next().equals("main")) found = true;
             }
-            if (entry.getKind().equals("var") || entry.getKind().equals("field") || entry.getKind().equals("param")) {
+            if (entry.getKind().equals("var") || entry.getKind().equals("field") || entry.getKind().equals("param") || entry.getKind().equals("method")) {
                 // int, int[], boolean, boolean[] always exist
                 if (entry.getType().equals("int") || entry.getType().equals("int[]") || entry.getType().equals("boolean") || entry.getType().equals("boolean[]")) {
                     continue;
@@ -89,11 +89,13 @@ public class SymbolTableChecks {
                             if (entry2.getIdentifier().equals(entry.getType()))
                                 found = true;
                     }
+                    if (!found)
+                        throw new Exception("Semantic Error: Type doesn't exist");
+                    else
+                        found = false;
                 }
             }
         }
-        if (!found)
-            throw new Exception("Semantic Error: Type doesn't exist");
     }
 
     public static void ProperOverrideCheck(MySymbolTable table) throws Exception {
