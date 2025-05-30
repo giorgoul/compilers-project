@@ -207,17 +207,33 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         return type + " " + name;
     }
 
+    /**
+        * f0 -> IntegerArrayType()
+        *       | BooleanArrayType()
+    */
     @Override
-    public String visit(ArrayType n, Void argu) {
-        return "int[]";
+    public String visit(ArrayType n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
     }
 
+    @Override
     public String visit(BooleanType n, Void argu) {
         return "boolean";
     }
 
+    @Override
     public String visit(IntegerType n, Void argu) {
         return "int";
+    }
+
+    @Override
+    public String visit(BooleanArrayType n, Void argu) {
+        return "boolean[]";
+    }
+
+    @Override
+    public String visit(IntegerArrayType n, Void argu) {
+        return "int[]";
     }
 
     @Override

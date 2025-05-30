@@ -759,17 +759,4 @@ class MySecondVisitor extends GJDepthFirst<String, Void>{
         String name = n.f1.accept(this, null);
         return type + " " + name;
     }
-
-    @Override
-    public String visit(ArrayType n, Void argu) {
-        return "int[]";
-    }
-
-    public String visit(BooleanType n, Void argu) {
-        return "boolean";
-    }
-
-    public String visit(IntegerType n, Void argu) {
-        return "int";
-    }
 }
